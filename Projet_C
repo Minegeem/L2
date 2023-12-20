@@ -98,6 +98,7 @@ void init_tab(Case plateau[LIGNES][COLONNES]){
 
 Unite* piece(char camp,char type,int force,int posx,int posy,int destx,int desty,char production,int temps,int toursrestant,struct unite *usuiv, struct unite *uprec,struct unite *colsuiv,struct unite *colprec,struct unite *vsuiv,struct unite *vprec){
   Unite *r = (Unite *)malloc(sizeof(Unite));
+  if(r == NULL) return NULL;
   r->camp = camp;
   r->type = type;
   r->force = force;
