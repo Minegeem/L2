@@ -7,7 +7,7 @@
 
 // Les deux camps :
 #define ABEILLE 'A'
-#define FRELON 'F'
+#define FRELONCAMP 'F'
 
 // Les types d'unites :
 #define REINE 'r'
@@ -29,7 +29,7 @@
 #define TESCADRON 6
 #define TFRELON 5
 #define TRECOLTE 4
-5
+
 
 // Les couts necessaires a la production :
 #define CREINEA 7
@@ -50,34 +50,93 @@
 
 // La structure Unite :
 typedef struct unite {
-char camp; // ABEILLE ou FRELON
-char type; // RUCHE, NID, REINE, OUVRIERE, GUERRIERE, ESCADRON ou FRELON
-int force; // la force de l'unite
-int posx, posy; // position actuelle sur la grille
-int destx, desty; // destination (negatif si immobile)
-char production; // production d'une ruche ou d'un nid et RECOLTE pour la recolte de pollen
-int temps; // nombres de tours total pour cette production
-int toursrestant; // tours restant pour cette production
-struct unite *usuiv, *uprec; // liste des unites affiliees a une ruche ou un nid
-struct unite *colsuiv, *colprec; // liste des autres ruches ou nids (colonies) du même camp
-struct unite *vsuiv, *vprec; // liste des autres unites sur la meme case
+  char camp; // ABEILLE ou FRELON
+  char type; // RUCHE, NID, REINE, OUVRIERE, GUERRIERE, ESCADRON ou FRELON
+  int force; // la force de l'unite
+  int posx, posy; // position actuelle sur la grille
+  int destx, desty; // destination (negatif si immobile)
+  char production; // production d'une ruche ou d'un nid et RECOLTE pour la recolte de pollen
+  int temps; // nombres de tours total pour cette production
+  int toursrestant; // tours restant pour cette production
+  struct unite *usuiv, *uprec; // liste des unites affiliees a une ruche ou un nid
+  struct unite *colsuiv, *colprec; // liste des autres ruches ou nids (colonies) du même camp
+  struct unite *vsuiv, *vprec; // liste des autres unites sur la meme case
 } Unite, *UListe;
+
+
 
 // La structure Case :
 typedef struct {
-Unite *colonie; // S'il y a une ruche ou un nid sur la case
-UListe occupant; // les autres occupants de la case
+  Unite *colonie; // S'il y a une ruche ou un nid sur la case
+  UListe occupant; // les autres occupants de la case
 } Case;
 
 // La structure Grille :
 typedef struct {
-Case plateau[X][Y];
-UListe abeille, frelon;
-int tour; // Numero du tour
-int ressourcesAbeille, ressourcesFrelon;
+  Case plateau[LIGNES][COLONNES];
+  UListe abeille, frelon;
+  int tour; // Numero du tour
+  int ressourcesAbeille, ressourcesFrelon;
 } Grille;
 
+Case* init_case(void){
+  Case* c = (Case *)malloc(sizeof(Case));
+  c->colonie = NULL;
+  c->occupant = NULL;
+  return c;
+}
+
+
+void init_tab(Case plateau[LIGNES][COLONNES]){
+    for(int i = 0; i<LIGNES;i++){
+      for(int j = 0; j<COLONNES ; j++){
+        plateau[i][j] = *init_case();
+      }
+    }
+}
+
+Unite* piece(char camp,char type,int force,int posx,int posy,int destx,int desty,char production,int temps,int toursrestant,struct unite *usuiv, struct unite *uprec,struct unite *colsuiv,struct unite *colprec,struct unite *vsuiv,struct unite *vprec){
+  Unite *r = (Unite *)malloc(sizeof(Unite));
+  r->camp = camp;
+  r->type = type;
+  r->force = force;
+  r->posx = posx;
+  r->posy = posy;
+  r->destx = destx;
+  r->desty = desty;
+  r->production = production;
+  r->temps = temps;
+  r->toursrestant = toursrestant;
+  r->usuiv = usuiv;
+  r->uprec = uprec;
+  r->colsuiv = colsuiv;
+  r->colprec = colprec;
+  r->vsuiv = vsuiv;
+  r->vprec = vprec;
+  return r;
+}
+
 int main(){
-  printf("caca");
+  Grille jeu;
+
+  Unite *ruche0 = piece(ABEILLE,RUCHE,0,0,0,-1,-1,RUCHE,0,0,NULL,NULL,NULL,NULL,NULL,NULL);
+  Unite *nid0 = piece(FRELONCAMP,NID,0,17,11,-1,-1,NID,0,0,NULL,NULL,NULL,NULL,NULL,NULL);
+
+  init_tab(jeu.plateau);
+  
+  jeu.plateau[0][0].colonie = ruche0;
+  jeu.plateau[17][11].colonie = nid0;
+  
+  for(int i = 0; i<LIGNES;i++){
+    printf("------------------------\n");
+    for(int j = 0; j<COLONNES;j++){
+      if(jeu.plateau[i][j].colonie != NULL) 
+        printf("%c,",jeu.plateau[i][j].colonie->type);
+      else 
+        printf(" ,");
+      
+    }
+    printf("\n");
+  }
   return 0;
 }
