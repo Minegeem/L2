@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // Dimensions de la grille en nombre de cases (origine en haut a gauche) :
 #define COLONNES 12
@@ -116,17 +117,7 @@ Unite* piece(char camp,char type,int force,int posx,int posy,int destx,int desty
   return r;
 }
 
-int main(){
-  Grille jeu;
-
-  Unite *ruche0 = piece(ABEILLE,RUCHE,0,0,0,-1,-1,RUCHE,0,0,NULL,NULL,NULL,NULL,NULL,NULL);
-  Unite *nid0 = piece(FRELONCAMP,NID,0,17,11,-1,-1,NID,0,0,NULL,NULL,NULL,NULL,NULL,NULL);
-
-  init_tab(jeu.plateau);
-  
-  jeu.plateau[0][0].colonie = ruche0;
-  jeu.plateau[17][11].colonie = nid0;
-  
+void affichage(Grille jeu){
   for(int i = 0; i<LIGNES;i++){
     printf("------------------------\n");
     for(int j = 0; j<COLONNES;j++){
@@ -138,5 +129,73 @@ int main(){
     }
     printf("\n");
   }
+}
+
+int tire_de(){
+  return rand()%60 + 1;
+}
+
+int combat(char abeille,char frelons){
+  int res1 = tire_de();
+  int res2 = tire_de();
+  switch (abeille)
+  {
+  case REINE:
+    res1 = res1 * FREINE;
+    break;
+  
+  case OUVRIERE:
+    res1 = res1 * FOUVRIERE;
+    break;
+  
+  case GUERRIERE:
+    res1 = res1 * FGUERRIERE;
+    break;
+  
+  case ESCADRON:
+    res1 = res1 * FESCADRON;
+    break;
+  
+  default:
+    res1 = 0;
+    break;
+  }
+  switch (frelons)
+  {
+  case REINE:
+    res2 = res2 * FREINE;
+    break;
+
+  case FRELON:
+    res2 = res2 * FFRELON;
+    break;
+
+  default:
+    res2 = 0;
+    break;
+  }
+  return res1-res2;
+}
+
+int main(){
+  srand(time(NULL));
+  Grille jeu;
+
+  Unite *ruche0 = piece(ABEILLE,RUCHE,0,0,0,-1,-1,RUCHE,0,0,NULL,NULL,NULL,NULL,NULL,NULL);
+  Unite *nid0 = piece(FRELONCAMP,NID,0,17,11,-1,-1,NID,0,0,NULL,NULL,NULL,NULL,NULL,NULL);
+
+
+
+  init_tab(jeu.plateau);
+  
+  jeu.plateau[0][0].colonie = ruche0;
+  jeu.plateau[17][11].colonie = nid0;
+  int res;
+  do{
+  res = combat(ESCADRON,FRELON);
+  }while (res == 0);
+  if(res > 0) printf("Abeille on gagner avec %d d'avance", res);
+  else printf("Frelons on gagner avec %d", -res);
+  
   return 0;
 }
