@@ -344,6 +344,20 @@ void deplacer(unite* creat){
   }
 }
 
+//pas oublier de quand la récolte est fini, reset la valeur de production
+//pas oublier de vérifier apres chaque tour dans le main si toursrestant est égal à 0, si oui, ajouter une ressource pollen et tuer l'ouvriere sans rapporter de ressource au frelon
+void recolter_pollen(Unite* creat){
+    if(creat->production=''){
+      creat->production='p'; /*pour pollen*/ 
+      creat->destx, desty=-1;-1 //immobile quand récolte du pollen, meurt apres donc pas besoin de modif sa valeur
+      creat->temps=4;
+      creat->toursrestant=4;
+    }
+    else{
+      printf("récolte déjà en cours");
+    }
+}
+
 void pouvoir_unite(Unite* creat,int choix /*un nombre entre -1, 0 et 1 pour choisir ce qu'il veut faire (0 se déplacer si il peut, 1 utiliser son pouvoir si il en a et -1 pour skip si il peut)*/){
   char type=creat->type;
     switch(type){
