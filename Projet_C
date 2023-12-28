@@ -96,9 +96,9 @@ void init_tab(Case plateau[LIGNES][COLONNES]){
       }
     }
 }
-
+// Unite *nid0 = piece(FRELONCAMP,NID,0,17,11,' ',0,0);
 //alloue chaque piece et renvoit un pointeur sur celle ci
-Unite* piece(char camp,char type,int force,int posx,int posy,int destx,int desty,char production,int temps,int toursrestant,struct unite *usuiv, struct unite *uprec,struct unite *colsuiv,struct unite *colprec,struct unite *vsuiv,struct unite *vprec){
+Unite* piece(char camp,char type,int force,int posx,int posy,char production,int temps,int toursrestant){
   Unite *r = (Unite *)malloc(sizeof(Unite));
   if(r == NULL) return NULL;
   r->camp = camp;
@@ -106,17 +106,17 @@ Unite* piece(char camp,char type,int force,int posx,int posy,int destx,int desty
   r->force = force;
   r->posx = posx;
   r->posy = posy;
-  r->destx = destx;
-  r->desty = desty;
+  r->destx = -1;
+  r->desty = -1;
   r->production = production;
   r->temps = temps;
   r->toursrestant = toursrestant;
-  r->usuiv = usuiv;
-  r->uprec = uprec;
-  r->colsuiv = colsuiv;
-  r->colprec = colprec;
-  r->vsuiv = vsuiv;
-  r->vprec = vprec;
+  r->usuiv = NULL;
+  r->uprec = NULL;
+  r->colsuiv = NULL;
+  r->colprec = NULL;
+  r->vsuiv = NULL;
+  r->vprec = NULL;
   return r;
 }
 
@@ -135,294 +135,200 @@ void affichage(Grille jeu){
   }
 }
 
-Unite creer_abeille(char abeille /*donne le type de l'abeille(fourni quand tu demandes un type spécifique à la ruche)*/){
-  //peut être faire un malloc
-  unite* nouvelle_abeille=(Unite *)malloc(sizeof(Unite));
-    nouvelle_abeille->camp=ABEILLE
-    nouvelle_abeille->*usuiv, *uprec=NULL;/*liste des unites affiliees a une ruche ou un nid*/
-    nouvelle_abeille->*colsuiv, *colprec=NULL;/*liste des autres ruches ou nids (colonies) du même camp*/
-    nouvelle_abeille->*vsuiv, *vprec=NULL;/*liste des autres unites sur la meme case*/
+Unite* creer_abeille(char abeille , int ruchex ,int ruchey){/*Création d'unité coté Abeilles*/
+    Unite* nouvelle_abeille;
     switch(abeille){
-      case 'r':
-        nouvelle_abeille->type=REINE;
-        nouvelle_abeille->force=FREINE;
-        nouvelle_abeille->posx, posy=0,0;
-        nouvelle_abeille->destx, desty=-1,-1;
-        nouvelle_abeille->production=''/*pas de production*/
-        nouvelle_abeille->temps=TREINEA;
-        nouvelle_abeille->toursrestant=TREINEA;
+        case 'R':
+        nouvelle_abeille = piece(ABEILLE,RUCHE,0,ruchex,ruchey,' ',1,1);
         break;
-      case 'o':
-        nouvelle_abeille->type=OUVRIERE;
-        nouvelle_abeille->force=FOUVRIERE;
-        nouvelle_abeille->posx, posy=0,0;
-        nouvelle_abeille->destx, desty=-1,-1;
-        nouvelle_abeille->production=''/*récolte pas encore*/
-        nouvelle_abeille->temps=TOUVRIERE;
-        nouvelle_abeille->toursrestant=TOUVRIERE;
+        case 'r':
+        nouvelle_abeille = piece(ABEILLE,FREINE,FREINE,ruchex,ruchey,' ',TREINEA,TREINEA);
         break;
-      case 'g':
-        nouvelle_abeille->type=GUERRIERE;
-        nouvelle_abeille->force=FGUERRIERE;
-        nouvelle_abeille->posx, posy=0,0;
-        nouvelle_abeille->destx, desty=-1,-1;
-        nouvelle_abeille->production=''/*pas de production*/
-        nouvelle_abeille->temps=TGUERRIERE;
-        nouvelle_abeille->toursrestant=TGUERRIERE;
+        case 'o':
+        nouvelle_abeille = piece(ABEILLE,OUVRIERE,FOUVRIERE,ruchex,ruchey,' ',TOUVRIERE,TOUVRIERE);
         break;
-      case 'e':
-        nouvelle_abeille->type=ESCADRON;
-        nouvelle_abeille->force=FESCADRON;
-        nouvelle_abeille->posx, posy=0,0;
-        nouvelle_abeille->destx, desty=-1,-1;
-        nouvelle_abeille->production=''/*pas de production*/
-        nouvelle_abeille->temps=TESCADRON;
-        nouvelle_abeille->toursrestant=TESCADRON;
+        case 'g':
+        nouvelle_abeille = piece(ABEILLE,GUERRIERE,FGUERRIERE,ruchex,ruchey,' ',TGUERRIERE,TGUERRIERE);
+        break;
+        case 'e':
+        nouvelle_abeille = piece(ABEILLE,ESCADRON,FESCADRON,ruchex,ruchey,' ',TESCADRON,TESCADRON);
         break;
     }
     return nouvelle_abeille;
 }
 
-Unite creer_frelon(char frelon /*donne le type du frelon*/){
-  //peut être faire un malloc
-  unite* nouveau_frelon=(Unite *)malloc(sizeof(Unite));
-    nouveau_frelon->camp=FRELONCAMP
-    nouveau_frelon->*usuiv, *uprec=NULL;/*liste des unites affiliees a une ruche ou un nid*/
-    nouveau_frelon->*colsuiv, *colprec=NULL;/*liste des autres ruches ou nids (colonies) du même camp*/
-    nouveau_frelon->*vsuiv, *vprec=NULL;/*liste des autres unites sur la meme case*/
+Unite* creer_frelon(char frelon,int ruchex, int ruchey ){ /*Création de d'unité coté Frelons*/
+    Unite* nouveau_frelon;
     switch(frelon){
-      case 'r':
-        nouveau_frelon->type=REINE;
-        nouveau_frelon->force=FREINE;
-        nouveau_frelon->posx, posy=17,11;
-        nouveau_frelon->destx, desty=-1,-1;
-        nouveau_frelon->production=''/*pas de production*/
-        nouveau_frelon->temps=TREINEF;
-        nouveau_frelon->toursrestant=TREINEF;
+        case 'N':
+        nouveau_frelon = piece(FRELONCAMP,NID,0,ruchex,ruchey,' ',1,1);
         break;
-      case 'f':
-        nouveau_frelon->type=FRELON;
-        nouveau_frelon->force=FFRELON;
-        nouveau_frelon->posx, posy=17,11;
-        nouveau_frelon->destx, desty=-1,-1;
-        nouveau_frelon->production=''/*pas de production*/
-        nouveau_frelon->temps=TFRELON;
-        nouveau_frelon->toursrestant=TFRELON;
+        case 'r':
+        nouveau_frelon = piece(FRELONCAMP,REINE,FREINE,ruchex,ruchey,' ',TREINEF,TREINEF);
+        break;
+        case 'f':
+        nouveau_frelon = piece(FRELONCAMP,FRELON,FFRELON,ruchex,ruchey,' ',TFRELON,TFRELON);
         break;
     }
     return nouveau_frelon;
 }
 
-void skip_tour(){
-  continue;
-}
-
-
-void creer_maison(char camp_qui_joue /*A pour abeille et F pour frelon*/){
-  unite* nouvelle_maison=(Unite *)malloc(sizeof(Unite));
-  nouvelle_maison->camp=camp_qui_joue;
-  nouvelle_maison->force=0;
-  nouvelle_maison->posx, posy=NULL;/*endroit ou la reine en question décide de créer la ruche*/
-  nouvelle_maison->destx, desty=-1,-1;
-  nouvelle_maison->production='';//ne créer pas encore et meme si c'est le cas, cette valeur ne devrait pas bouger
-  nouvelle_maison->temps=1; //est créer à la fin du tour
-  nouvelle_maison->toursrestant=1;
-  switch(camp_qui_joue){
-    case 'A':
-      nouvelle_maison->type=RUCHE;
-      nouvelle_maison->*usuiv, *uprec=NULL;// liste des unites affiliees a une ruche ou un nid
-      nouvelle_maison->*colsuiv, *colprec=NULL;// liste des autres ruches ou nids (colonies) du même camp
-      nouvelle_maison->*vsuiv, *vprec=NULL;// liste des autres unites sur la meme case
-      break;
-    case 'F':
-      nouvelle_maison->type=NID;
-      nouvelle_maison->*usuiv, *uprec=NULL;// liste des unites affiliees a une ruche ou un nid
-      nouvelle_maison->*colsuiv, *colprec=NULL;// liste des autres ruches ou nids (colonies) du même camp
-      nouvelle_maison->*vsuiv, *vprec=NULL;// liste des autres unites sur la meme case
-      break;
-  }
-}
-
-void deplacer(unite* creat){
+void deplacer(Unite* creat){
   //j'ai preferé faire avec un switch, comme ca si on change la condition (genre on passe du scanf à un clique de la souris), on aura juste à changer la manière d'avoir les informations et pas le switch
-  printf("ou voulez vous vous déplacez ? (hg(haut gauche),h(haut),hd(haut droite),d,bd,b,bg,g)");
-  char* deplacement;
-  scanf("%s",&deplacement)
-  while(deplacement !='hg' || deplacement !='h' || deplacement !='hd' || deplacement !='d'|| deplacement !='bd' || deplacement !='b' || deplacement !='bg'|| deplacement !='g' ){
-    scanf("%s",&deplacement)
-  }
+  printf("Ou voulez vous vous déplacez ? ( NO(Nord-Ouest), N(Nord), NE(Nord-Est), E(Est), SE(Sud-Est), S(Sud), SO(Sud-Ouest), O(Ouest))");
+  char deplacement[3] = "";
+  do{
+  scanf("%s",&deplacement);
+  }while(deplacement !='NO' || deplacement !='N' || deplacement !='NE' || deplacement !='E'|| deplacement !='SE' || deplacement !='S' || deplacement !='SO'|| deplacement !='O' );
   int cpt=0;
   //vérifie si le coup à bien été joué, si on décide de déplacer une unité, on la déplace obligatoirement
   while(cpt==0){
-  switch(deplacement){
-    case "hg":
+  switch(deplacement[3]){
+    case 'NO':
     //on voit si la future position est bien dans le plateau de jeu
-      tmpx=creat->posx;
-      tmpy=creat->posy;
-      if ((0<=tmpx-1<18) && (0<=tmpy-1<18)){
-        creat->posx,posy=posx-1,posy-1;
+      int tmpx=creat->posx;
+      int tmpy=creat->posy;
+      if ((0<=tmpx-1<18) && (0<=tmpy-1<12)){
+        creat->posx = tmpx-1;
+        creat->posy = tmpy-1;
         cpt+=1;
-      }
-      else{
-        printf("Impossible d'accéder à cette endroit")
-      }
+      } 
+      else 
+        printf("Impossible d'accéder à cette endroit");
       break;
-    case "h":
-      tmpy=creat->posy;
-      if (0<=tmpy-1<18){
-        creat->posx,posy=posx,posy-1;
+    case 'N':
+      if (0<=tmpy-1<12){
+        creat->posy = tmpy-1;
         cpt+=1;
-      }
-      else{
-        printf("Impossible d'accéder à cette endroit")
-      }
+      } 
+      else 
+        printf("Impossible d'accéder à cette endroit");
        break;
-    case "hd":
-      tmpx=creat->posx;
-      tmpy=creat->posy;
-      if ((0<=tmpx+1<18) && (0<=tmpy-1<18)){
-        creat->posx,posy=posx+1,posy-1;
+    case 'NE':
+      if ((0<=tmpx+1<18) && (0<=tmpy-1<12)){
+        creat->posx = tmpx+1;
+        creat->posy = tmpy-1;
         cpt+=1;
-      }
-      else{
-        printf("Impossible d'accéder à cette endroit")
-      }
+      } 
+      else 
+        printf("Impossible d'accéder à cette endroit");
       break;
-    case "d":
-      tmpx=creat->posx;
+    case 'E':
+      if (0<=tmpx+1<18){
+        creat->posx = tmpx+1;
+        cpt+=1;
+      } 
+      else 
+        printf("Impossible d'accéder à cette endroit");
+      break;
+    case 'SE':
+      if ((0<=tmpx+1<18) && (0<=tmpy+1<12)){
+        creat->posx = tmpx+1;
+        creat->posy = tmpy+1;
+        cpt+=1;
+      } 
+      else 
+        printf("Impossible d'accéder à cette endroit");
+      break;
+    case 'S':
+      if (0<=tmpy+1<12){
+        creat->posy = tmpy+1;
+        cpt+=1;
+      } 
+      else 
+        printf("Impossible d'accéder à cette endroit");
+      break;
+    case 'SO':
+      if ((0<=tmpx-1<18) && (0<=tmpy+1<12)){
+        creat->posx = tmpx-1;
+        creat->posy = tmpy+1;
+        cpt+=1;
+      } 
+      else 
+        printf("Impossible d'accéder à cette endroit");
+      break;
+    case 'O':
       if (0<=tmpx-1<18){
-        creat->posx,posy=posx+1,posy;
+        creat->posx = tmpx-1;
         cpt+=1;
-      }
-      else{
-        printf("Impossible d'accéder à cette endroit")
-      }
+      } 
+      else 
+        printf("Impossible d'accéder à cette endroit");
       break;
-    case "bd":
-      tmpx=creat->posx;
-      tmpy=creat->posy;
-      if ((0<=tmpx+1<18) && (0<=tmpy+1<18)){
-        creat->posx,posy=posx+1,posy+1;
-        cpt+=1;
-      }
-      else{
-        printf("Impossible d'accéder à cette endroit")
-      }
-      break;
-    case "b":
-      tmpy=creat->posy;
-      if (0<=tmpy+1<18){
-        creat->posx,posy=posx,posy+1;
-        cpt+=1;
-      }
-      else{
-        printf("Impossible d'accéder à cette endroit")
-      }
-      break;
-    case "bg":
-      tmpx=creat->posx;
-      tmpy=creat->posy;
-      if ((0<=tmpx-1<18) && (0<=tmpy+1<18)){
-        creat->posx,posy=posx-1,posy+1;
-        cpt+=1;
-      }
-      else{
-        printf("Impossible d'accéder à cette endroit")
-      }
-      break;
-    case "g":
-      tmpx=creat->posx;
-      if (0<=tmpx-1<18){
-        creat->posx,posy=posx-1,posy;
-        cpt+=1;
-      }
-      else{
-        printf("Impossible d'accéder à cette endroit")
-      }
-      break;
-  }
+    }
   }
 }
 
 //pas oublier de quand la récolte est fini, reset la valeur de production
 //pas oublier de vérifier apres chaque tour dans le main si toursrestant est égal à 0, si oui, ajouter une ressource pollen et tuer l'ouvriere sans rapporter de ressource au frelon
 void recolter_pollen(Unite* creat){
-    if(creat->production=''){
-      creat->production='p'; /*pour pollen*/ 
-      creat->destx, desty=-1;-1 //immobile quand récolte du pollen, meurt apres donc pas besoin de modif sa valeur
-      creat->temps=4;
-      creat->toursrestant=4;
-    }
-    else{
-      printf("récolte déjà en cours");
-    }
-}
-
-void pouvoir_unite(Unite* creat,int choix /*un nombre entre -1, 0 et 1 pour choisir ce qu'il veut faire (0 se déplacer si il peut, 1 utiliser son pouvoir si il en a et -1 pour skip si il peut)*/){
-  char type=creat->type;
-    switch(type){
-      case 'R':
-          if (choix==1){
-            //demande à l'utilisateur le type qu'il veut
-            printf('Type voulue (r pour reine,o pour ouvriere,g pour guerriere,e pour escouade)')
-            char type_voulu;
-            scanf("%s",&type_voulu) /* %s ici pour éviter les erreurs si l'utilisateur met plus d'un caractère*/
-            while(type_voulu !='r' || type_voulu !='o' || type_voulu !='g' || type_voulu !='e' ){
-              scanf("%s",&type_voulu)
-            }
-            //problème ici, je n'utilise pas la partie production de la ruche, je pense pas en avoir besoin comme dans le créer abeille on a un switch en fonction de quelle abeille on veut
-            creer_abeille(type_voulu);
-          } 
-          if (choix==-1)skip_tour();
-          break;
-      case 'N':
-          if (choix==1){
-            //demande à l'utilisateur le type qu'il veut
-            printf('Type voulue (r pour reine,f pour frelon)')
-            char type_voulu;
-            scanf("%s",&type_voulu) /* %s ici pour éviter les erreurs si l'utilisateur met plus d'un caractère*/
-            while(type_voulu !='r' || type_voulu !='f'){
-              scanf("%s",&type_voulu)
-            }
-            creer_frelon(type_voulu);
-          }
-          if (choix==-1)skip_tour();
-          break;
-      case 'r':
-          if (choix==0)deplacer(creat);
-          if (choix==1)creer_maison( camp qui joue/*ruche ou nid en fonction du type de reine*/);
-          if (choix==-1)skip_tour();/*dans le sujet ils précisent que c'est possible, donc il existe des cas où c'est pas possible donc fonction*/
-          break;
-      case 'e':
-          if (choix==0)deplacer(creat);
-          if (choix==-1)skip_tour();
-          break;
-      case 'g':
-          if (choix==0)deplacer(creat);
-          if (choix==-1)skip_tour();
-          break;
-      case 'f':
-          if (choix==0)deplacer(creat);
-          if (choix==-1)skip_tour();
-          break; 
-      case 'o':
-          if (choix==0)deplacer(creat);
-          if (choix==1)recolter_pollen();
-          break;
+    if(creat->production = ' '){
+        creat->production='p'; /*pour pollen*/ 
+        creat->destx = -1;
+        creat->desty = -1; //immobile quand récolte du pollen, meurt apres donc pas besoin de modif sa valeur
+        creat->temps = 4;
+        creat->toursrestant = 4;
   }
 }
 
+void pouvoir_unite(Unite* creat,int choix ){ /*un nombre entre 0 et 1 pour choisir ce qu'il veut faire (0 se déplacer si il peut, 1 utiliser son pouvoir sinon pour skip)*/
+char type = creat->type;
+    switch(type){
+    case 'R':
+        if (choix==1){
+            char type_voulu;
+            printf('Type voulue (r pour reine,o pour ouvriere,g pour guerriere,e pour escouade)'); //demande à l'utilisateur le type qu'il veut
+            
+            do{
+            scanf("%s",&type_voulu); /* %s ici pour éviter les erreurs si l'utilisateur met plus d'un caractère*/
+            } while(type_voulu !='r' || type_voulu !='o' || type_voulu !='g' || type_voulu !='e' );
+            //problème ici, je n'utilise pas la partie production de la ruche, je pense pas en avoir besoin comme dans le créer abeille on a un switch en fonction de quelle abeille on veut
+            creer_abeille(type_voulu, creat->posx, creat->posy);
+        } 
+        break;
+    case 'N':
+        if (choix==1){
+            //demande à l'utilisateur le type qu'il veut
+            printf('Type voulue (r pour reine,f pour frelon)');
+            char type_voulu;
+            do{
+            scanf("%s ",&type_voulu); /* %s ici pour éviter les erreurs si l'utilisateur met plus d'un caractère*/
+            }while(type_voulu !='r' || type_voulu !='f');
+            creer_frelon(type_voulu, creat->posx, creat->posy);
+        }
+        break;
+    case 'r':
+        /* Dans le sujet ils précisent que c'est possible, donc il existe des cas où c'est pas possible donc fonction*/
+        if (choix==0)deplacer(creat);
+        if (choix==1){
+            if(creat->camp == 'A')creer_abeille(NID, creat->posx,creat->posy); 
+            if(creat->camp == 'F')creer_frelon(RUCHE, creat->posx,creat->posy);
+            }
+        break;
+    case 'o':
+        if (choix==0)deplacer(creat);
+        if (choix==1)recolter_pollen(creat);
+        break;
+    case 'e':
+        if (choix==0)deplacer(creat);
+        break;
+    case 'g':
+        if (choix==0)deplacer(creat);
+        break;
+    case 'f':
+        if (choix==0)deplacer(creat);
+        break; 
+  }
+}
 
-//combat entre abeille et frelon
 int tire_de(){
   return rand()%60 + 1;
 }
 
-int combat(char abeille,char frelons){
+int combat(char abeille,char frelons){ //combat entre abeille et frelon
   int res1 = tire_de();
   int res2 = tire_de();
-  switch (abeille)
-  {
+  switch (abeille){
   case REINE:
     res1 = res1 * FREINE;
     break;
@@ -443,8 +349,7 @@ int combat(char abeille,char frelons){
     res1 = 0;
     break;
   }
-  switch (frelons)
-  {
+  switch (frelons){
   case REINE:
     res2 = res2 * FREINE;
     break;
@@ -460,18 +365,47 @@ int combat(char abeille,char frelons){
   return res1-res2;
 }
 
+void initialisation_jeu(Grille jeu){
+    creer_abeille(RUCHE,0,0);
+    creer_abeille(ESCADRON,0,0);
+    creer_abeille(GUERRIERE,0,0);
+    creer_abeille(OUVRIERE,0,0);
+    creer_abeille(REINE,0,0);
+    creer_frelon(NID,17,12);
+    creer_frelon(FRELON,17,12);
+    creer_frelon(FRELON,17,12);
+    creer_frelon(REINE,17,12);
+}
+
+void ajoute_occupant(Unite* Liste, Unite* new_occupant){
+    Unite* tmp = Liste;
+    while(tmp->vsuiv == NULL){
+        tmp = tmp->vsuiv;
+    }
+    tmp->vsuiv = new_occupant;
+    new_occupant->vprec = tmp;
+}
+
+void ajoute_unite(Unite* Liste, Unite* new_unite){
+    Unite* tmp = Liste;
+    while(tmp->usuiv == NULL){
+        tmp = tmp->usuiv;
+    }
+    tmp->usuiv = new_unite;
+    new_unite->uprec = tmp;
+}
+
 int main(){
   srand(time(NULL));
   Grille jeu;
-  Unite *ruche0 = piece(ABEILLE,RUCHE,0,0,0,-1,-1,RUCHE,0,0,NULL,NULL,NULL,NULL,NULL,NULL);
-  Unite *nid0 = piece(FRELONCAMP,NID,0,17,11,-1,-1,NID,0,0,NULL,NULL,NULL,NULL,NULL,NULL);
-
-
 
   init_tab(jeu.plateau);
+  Unite* ruche = creer_abeille(RUCHE,0,0);
+  Unite* nid = creer_frelon(NID,17,11);
+
   
-  jeu.plateau[0][0].colonie = ruche0;
-  jeu.plateau[17][11].colonie = nid0;
+  jeu.plateau[0][0].colonie = ruche;
+  jeu.plateau[17][11].colonie = nid;
   int res;
   do{
   res = combat(ESCADRON,FRELON);
