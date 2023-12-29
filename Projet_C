@@ -456,8 +456,17 @@ int combat(char abeille,char frelons){ //combat entre abeille et frelon
 }
 
 
-void ajoute_colonie(Grille* jeu,Unite* new_occupant,int posx,int posy){
+void ajoute_colonie(Grille* jeu,Unite** Liste,Unite* new_occupant,int posx,int posy){
     jeu->plateau[posx][posy].colonie = new_occupant;
+    Unite* tmp = *Liste;
+    if(tmp == NULL) *Liste = new_occupant;
+    else{  
+      while(tmp->colsuiv != NULL){
+          tmp = tmp->colsuiv;
+      }
+      tmp->colsuiv = new_occupant;
+      new_occupant->colprec = tmp;
+    }
 }
 
 void ajoute_occupant(Unite** Liste, Unite* new_occupant){
@@ -479,6 +488,71 @@ void ajoute_unite(Unite* Liste, Unite* new_unite){
     }
     tmp->usuiv = new_unite;
     new_unite->uprec = tmp;
+}
+
+// La structure Unite :
+typedef struct unite {
+  char camp; // ABEILLE ou FRELON
+  char type; // RUCHE, NID, REINE, OUVRIERE, GUERRIERE, ESCADRON ou FRELON
+  int force; // la force de l'unite
+  int posx, posy; // position actuelle sur la grille
+  int destx, desty; // destination (negatif si immobile)
+  char production; // production d'une ruche ou d'un nid et RECOLTE pour la recolte de pollen
+  int temps; // nombres de tours total pour cette production
+  int toursrestant; // tours restant pour cette production
+  struct unite *usuiv, *uprec; // liste des unites affiliees a une ruche ou un nid
+  struct unite *colsuiv, *colprec; // liste des autres ruches ou nids (colonies) du même camp
+  struct unite *vsuiv, *vprec; // liste des autres unites sur la meme case
+} Unite, *UListe;
+
+
+void supprime_colonie(Unite** Liste, Unite* old_colonie){
+  if (old_colonie->colprec==NULL){
+    *Liste=old_colonie->colsuiv;
+    old_colonie->colsuiv->colprec=NULL;
+    old_colonie->colsuiv=NULL;
+  }
+  if (old_colonie->colsuiv->colprec==NULL){
+    old_colonie->colprec->colsuiv=NULL;
+    old_colonie->colprec=NULL;
+  }
+  old_colonie->colprec->colsuiv=old_colonie->colsuiv;
+  old_colonie->colsuiv->colprec=old_colonie->colprec;
+  old_colonie->colsuiv=NULL;
+  old_colonie->colprec=NULL;
+  free(old_colonie);
+}
+
+void supprime_unite(Unite** Liste, Unite* old_unite){
+  //pour unite ruche
+  if (old_unite->uprec==NULL){
+    *Liste=old_unite->usuiv;
+    old_unite->usuiv->uprec=NULL;
+    old_unite->usuiv=NULL;
+  }
+  if (old_unite->usuiv->uprec==NULL){
+    old_unite->uprec->usuiv=NULL;
+    old_unite->uprec=NULL;
+  }
+  old_unite->uprec->usuiv=old_unite->usuiv;
+  old_unite->usuiv->uprec=old_unite->uprec;
+  old_unite->usuiv=NULL;
+  old_unite->uprec=NULL;
+  //pour unite case
+  if (old_unite->vprec==NULL){
+    *Liste=old_unite->vsuiv;
+    old_unite->vsuiv->vprec=NULL;
+    old_unite->vsuiv=NULL;
+  }
+  if (old_unite->vsuiv->vprec==NULL){
+    old_unite->vprec->vsuiv=NULL;
+    old_unite->vprec=NULL;
+  }
+  old_unite->vprec->vsuiv=old_unite->vsuiv;
+  old_unite->vsuiv->vprec=old_unite->vprec;
+  old_unite->vsuiv=NULL;
+  old_unite->vprec=NULL;
+  free(old_unite);
 }
 
 void initialisation_jeu(Grille* jeu){
