@@ -123,106 +123,51 @@ Unite* piece(char camp,char type,int force,int posx,int posy,char production,int
 //affiche le tableau
 void affichage(Grille jeu){
   Unite *tmp;
-  int e,g,ra,o,rf,f,rr,n;
+  
+  char place[10] = "     -   ";
   for(int i = 0; i<LIGNES;i++){
-    printf("-------------------------------------------------------------------------------------------\n");
-
+    printf("-----------------------------------------------------------------------------------------------------------------------\n");
     for(int j = 0; j<COLONNES;j++){
-    
-      e = 0;
-      g = 0;
-      ra = 0;
-      o = 0;
-      rf = 0;
-      f = 0;
-      rr = 0;
-      n = 0;
-   
-      if(jeu.plateau[i][j].colonie != NULL && jeu.plateau[i][j].colonie->type == RUCHE && rr == 0) 
-        printf("R");
-      else 
-        printf(" ");
+      place[0] = ' ';
+      place[1] = ' ';
+      place[2] = ' ';
+      place[3] = ' ';
+      place[4] = ' ';
+      place[6] = ' ';
+      place[7] = ' ';
+      place[8] = ' ';
 
-     
-      tmp = jeu.plateau[i][j].occupant;
-      
-      while(tmp != NULL){
-     
-        if (tmp->camp == ABEILLE){
-          if(tmp->type == 'r'){
-            if(ra == 0){
-              printf("r");
-              ra++;
-            }else{
-              printf(" ");
-              ra++;
-            }  
-          }else if(tmp->type == 'o'){
-            if(o == 0){
-              printf("o");
-              o++;
-            }else{
-              printf(" ");
-              o++;
-            }
-          }
-          else if(tmp->type == 'g'){
-            if(g == 0){
-              printf("g");
-              g++;
-            }else{
-              printf(" ");
-              g++;
-            }
-          }
-          else if(tmp->type == 'e'){
-            if(e == 0){
-              printf("e");
-              e++;
-            }else{
-              printf(" ");
-              e++;
-            }
-          }
-        }
-        tmp = tmp->vsuiv;
-      }
-   
-      printf("-");
-
-      if(jeu.plateau[i][j].colonie != NULL && jeu.plateau[i][j].colonie->type == NID && n == 0) 
-        printf("N");
-      else 
-        printf(" ");
-     
+      if(jeu.plateau[i][j].colonie != NULL && jeu.plateau[i][j].colonie->type == RUCHE) place[0] = 'R';
+      if(jeu.plateau[i][j].colonie != NULL && jeu.plateau[i][j].colonie->type == NID) place[6] = 'N';
       tmp = jeu.plateau[i][j].occupant;
       while(tmp != NULL){
-        if (jeu.plateau[i][j].occupant->camp == FRELONCAMP){
-          if(jeu.plateau[i][j].occupant->type == 'r' && rf == 0){
-            printf("r");
-              rf++;
-          }else{
-            printf(" ");
-            rf++;
-          }
-          if(jeu.plateau[i][j].occupant->type == 'f' && f == 0){
-            printf("f");
-              f++;
-          }else{
-            printf(" ");
-            f++;
-          }
-        }
+        switch (tmp->type)
+        {
+        case 'r':
+          if(tmp->camp == ABEILLE) place[1] = 'r';
+          else place[7] = 'r';
+          break;
+        case 'f':
+          place[8] = 'f';
+          break;
+        case 'g':
+          place[3] = 'g';
+          break;
+        case 'e':
+          place[4] = 'e';
+          break;
+        case 'o':
+          place[2] = 'o';
+          break;
+        }       
         tmp = tmp->vsuiv;
-        
       }
-      printf("|");
-    
+      printf("%s|",place);
     }
     printf("\n");
-   
   }
-}
+}  
+
 
 
 Unite* creer_abeille(char abeille , int ruchex ,int ruchey){ /*Création d'unité coté Abeilles*/
@@ -232,7 +177,7 @@ Unite* creer_abeille(char abeille , int ruchex ,int ruchey){ /*Création d'unit�
         nouvelle_abeille = piece(ABEILLE,RUCHE,0,ruchex,ruchey,' ',1,1);
         break;
         case 'r':
-        nouvelle_abeille = piece(ABEILLE,FREINE,FREINE,ruchex,ruchey,' ',TREINEA,TREINEA);
+        nouvelle_abeille = piece(ABEILLE,REINE,FREINE,ruchex,ruchey,' ',TREINEA,TREINEA);
         break;
         case 'o':
         nouvelle_abeille = piece(ABEILLE,OUVRIERE,FOUVRIERE,ruchex,ruchey,' ',TOUVRIERE,TOUVRIERE);
@@ -490,22 +435,6 @@ void ajoute_unite(Unite* Liste, Unite* new_unite){
     new_unite->uprec = tmp;
 }
 
-// La structure Unite :
-typedef struct unite {
-  char camp; // ABEILLE ou FRELON
-  char type; // RUCHE, NID, REINE, OUVRIERE, GUERRIERE, ESCADRON ou FRELON
-  int force; // la force de l'unite
-  int posx, posy; // position actuelle sur la grille
-  int destx, desty; // destination (negatif si immobile)
-  char production; // production d'une ruche ou d'un nid et RECOLTE pour la recolte de pollen
-  int temps; // nombres de tours total pour cette production
-  int toursrestant; // tours restant pour cette production
-  struct unite *usuiv, *uprec; // liste des unites affiliees a une ruche ou un nid
-  struct unite *colsuiv, *colprec; // liste des autres ruches ou nids (colonies) du même camp
-  struct unite *vsuiv, *vprec; // liste des autres unites sur la meme case
-} Unite, *UListe;
-
-
 void supprime_colonie(Unite** Liste, Unite* old_colonie){
   if (old_colonie->colprec==NULL){
     *Liste=old_colonie->colsuiv;
@@ -561,11 +490,11 @@ void initialisation_jeu(Grille* jeu){
     Unite *g = creer_abeille(GUERRIERE,0,0);
     Unite *o = creer_abeille(OUVRIERE,0,0);
     Unite *ra = creer_abeille(REINE,0,0);
-    ajoute_colonie(jeu,R,0,0);
-    ajoute_unite(R,ra);
-    ajoute_unite(R,o);
-    ajoute_unite(R,g);
+    //ajoute_colonie(jeu,R,0,0);
     ajoute_unite(R,e);
+    ajoute_unite(R,g);
+    ajoute_unite(R,o);
+    ajoute_unite(R,ra);
     ajoute_occupant(&jeu->plateau[0][0].occupant,ra);
     ajoute_occupant(&jeu->plateau[0][0].occupant,o);
     ajoute_occupant(&jeu->plateau[0][0].occupant,g);
@@ -574,7 +503,7 @@ void initialisation_jeu(Grille* jeu){
     Unite *f1 = creer_frelon(FRELON,17,11);
     Unite *f2 = creer_frelon(FRELON,17,11);
     Unite *rf = creer_frelon(REINE,17,11);
-    ajoute_colonie(jeu,R,17,12);
+    //ajoute_colonie(jeu,N,17,11);
     ajoute_unite(N,rf);
     ajoute_unite(N,f1);
     ajoute_unite(N,f2);
