@@ -415,106 +415,79 @@ void ajoute_colonie(Grille* jeu,Unite** Liste,Unite* new_occupant,int posx,int p
 }
 
 
-void ajoute_occupant(Unite** Liste, Unite* new_occupant){
+Unite * ajoute_occupant(Unite* Liste, Unite* new_occupant){
+    
+    Unite* tmp = Liste;
+    if(tmp == NULL) return new_occupant;
     switch(new_occupant->camp){
+    
     case ABEILLE :
+      
       switch(new_occupant->type){
+        
         case RUCHE:
-          Unite* tmp = *Liste;
-          if(tmp == NULL) *Liste = new_occupant;
-          else{  
-            while(tmp->type != REINE || tmp->type != OUVRIERE || tmp->type != GUERRIERE || tmp->type != ESCADRON || tmp->vsuiv != NULL){
-                tmp = tmp->vsuiv;
-            }
-            tmp->vsuiv = new_occupant;
-            new_occupant->vprec = tmp;
-          }
+          while(tmp->vsuiv != NULL || tmp->camp != FRELONCAMP) 
+              tmp = tmp->vsuiv;
           break;
+
+        case OUVRIERE:   
+          while(tmp->vsuiv != NULL || tmp->vsuiv->type != RUCHE || tmp->vsuiv->camp != FRELONCAMP)
+              tmp = tmp->vsuiv;
+          break;
+
         case REINE:
-          Unite* tmp = *Liste;
-          if(tmp == NULL) *Liste = new_occupant;
-          else{  
-            while(tmp->type != OUVRIERE || tmp->type != GUERRIERE || tmp->type != ESCADRON || tmp->vsuiv != NULL){
+            while(tmp->vsuiv != NULL || tmp->vsuiv->type != OUVRIERE || tmp->vsuiv->type != RUCHE || tmp->vsuiv->camp != FRELONCAMP)
                 tmp = tmp->vsuiv;
-            }
-            tmp->vsuiv = new_occupant;
-            new_occupant->vprec = tmp;
-          }
           break;
-        case OUVRIERE:
-          Unite* tmp = *Liste;
-          if(tmp == NULL) *Liste = new_occupant;
-          else{  
-            while(tmp->type != GUERRIERE || tmp->type != ESCADRON || tmp->vsuiv != NULL){
-                tmp = tmp->vsuiv;
-            }
-            tmp->vsuiv = new_occupant;
-            new_occupant->vprec = tmp;
-          }
-          break;
+
         case GUERRIERE:
-          Unite* tmp = *Liste;
-          if(tmp == NULL) *Liste = new_occupant;
-          else{  
-            while(tmp->type != ESCADRON || tmp->vsuiv != NULL){
-                tmp = tmp->vsuiv;
-            }
-            tmp->vsuiv = new_occupant;
-            new_occupant->vprec = tmp;
-          }
+
+          while(tmp->vsuiv != NULL || tmp->vsuiv->type != REINE || tmp->vsuiv->type != OUVRIERE || tmp->vsuiv->type != RUCHE || tmp->vsuiv->camp != FRELONCAMP) 
+              tmp = tmp->vsuiv;
           break;
+
         case ESCADRON:
-          Unite* tmp = *Liste;
-          if(tmp == NULL) *Liste = new_occupant;
-          else{  
-            while(tmp->vsuiv != NULL){
-                tmp = tmp->vsuiv;
-            }
-            tmp->vsuiv = new_occupant;
-            new_occupant->vprec = tmp;
-          }
+          while(tmp->vsuiv != NULL || tmp->vsuiv->type != GUERRIERE || tmp->vsuiv->type != REINE || tmp->vsuiv->type != OUVRIERE || tmp->vsuiv->type != RUCHE || tmp->vsuiv->camp != FRELONCAMP) 
+              tmp = tmp->vsuiv;
           break;
-    }
-    break;
+
+      break;
 
     case FRELONCAMP:
       switch(new_occupant->type){
         case NID:
-          Unite* tmp = *Liste;
-          if(tmp == NULL) *Liste = new_occupant;
-          else{  
-            while(tmp->type != REINE || tmp->type != FRELON || tmp->vsuiv != NULL){
-                tmp = tmp->vsuiv;
-            }
-            tmp->vsuiv = new_occupant;
-            new_occupant->vprec = tmp;
-          }
+          while(tmp->vsuiv != NULL || ((tmp->vsuiv->type == REINE || tmp->vsuiv->type == FRELON) && tmp->vsuiv->camp == FRELONCAMP))
+              tmp = tmp->vsuiv;
           break;
         case REINE:
-          Unite* tmp = *Liste;
-          if(tmp == NULL) *Liste = new_occupant;
-          else{  
-            while(tmp->type != FRELON ||  tmp->vsuiv != NULL){
-                tmp = tmp->vsuiv;
-            }
-            tmp->vsuiv = new_occupant;
-            new_occupant->vprec = tmp;
-          }
+      
+          while(tmp->vsuiv != NULL ||  tmp->vsuiv->type == FRELON)
+              tmp = tmp->vsuiv;
           break;
         case FRELON:
-          Unite* tmp = *Liste;
-          if(tmp == NULL) *Liste = new_occupant;
-          else{  
-            while(tmp->vsuiv != NULL){
-                tmp = tmp->vsuiv;
-            }
-            tmp->vsuiv = new_occupant;
-            new_occupant->vprec = tmp;
-          }
+          while(tmp->vsuiv != NULL)
+              tmp = tmp->vsuiv;
           break;
     }
     break;
-}
+    }
+  }
+  if(tmp->vsuiv == NULL){
+    tmp->vsuiv = new_occupant;
+    new_occupant->vprec = tmp;
+  }
+  else if(tmp->vprec == NULL){
+    tmp->vprec = new_occupant;
+    new_occupant->vsuiv = tmp;
+    Liste = new_occupant;
+  }
+  else {
+    new_occupant->vsuiv = tmp->vsuiv;
+    new_occupant->vprec = tmp;
+    tmp->vsuiv = new_occupant;
+    new_occupant->vsuiv->vprec = new_occupant;
+  }
+  return Liste;
 }
 
 void ajoute_unite(Unite* Liste, Unite* new_unite){
