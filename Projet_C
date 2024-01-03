@@ -88,6 +88,11 @@ Case* init_case(void){
   return c;
 }
 
+typedef struct {
+  int x,y;
+}Point;
+
+
 //créer un plateau de 18/12 de case alloué
 void init_tab(Case plateau[LIGNES][COLONNES]){
     for(int i = 0; i<LIGNES;i++){
@@ -322,13 +327,13 @@ void recolter_pollen(Unite* creat){
 
 
 // Utilise le pouvoir d'une Unité
-void pouvoir_unite(Unite* creat,int choix ){ /*un nombre entre 0 et 1 pour choisir ce qu'il veut faire (0 se déplacer si il peut, 1 utiliser son pouvoir sinon pour skip)*/
+void pouvoir_unite(Unite* creat,int choix ){ /*un nombre entre 0 et 1 pour choisir ce qu'il veut faire (0 se déplacer si il peut, 1 utiliser son pouvoir -1 pour se supprimer sinon skip)*/
 char type = creat->type;
     switch(type){
     case 'R':
         if (choix==1){
             char type_voulu;
-            printf("Type voulue (r pour reine,o pour ouvriere,g pour guerriere,e pour escouade)"); //demande à l'utilisateur le type qu'il veut
+            printf("Type voulue (r pour reine,o pour ouvriere,g pour guerriere,e pour escouade)\n"); //demande à l'utilisateur le type qu'il veut
             
             do{
             scanf("%s",&type_voulu); /* %s ici pour éviter les erreurs si l'utilisateur met plus d'un caractère*/
@@ -342,8 +347,8 @@ char type = creat->type;
             //demande à l'utilisateur le type qu'il veut
             printf("Type voulue (r pour reine,f pour frelon)");
             char type_voulu;
-            do{
             scanf("%s ",&type_voulu); /* %s ici pour éviter les erreurs si l'utilisateur met plus d'un caractère*/
+            do{
             }while(type_voulu !='r' || type_voulu !='f');
             creer_frelon(type_voulu, creat->posx, creat->posy);
         }
@@ -723,6 +728,7 @@ void initialisation_jeu(Grille* jeu){
     Unite *g = creer_abeille(GUERRIERE,0,0);
     Unite *o = creer_abeille(OUVRIERE,0,0);
     Unite *ra = creer_abeille(REINE,0,0);
+    jeu->abeille = R;
     ajoute_colonie(jeu,R,0,0);
     ajoute_unite(R,e);
     ajoute_unite(R,g);
@@ -736,6 +742,7 @@ void initialisation_jeu(Grille* jeu){
     Unite *f1 = creer_frelon(FRELON,17,11);
     Unite *f2 = creer_frelon(FRELON,17,11);
     Unite *rf = creer_frelon(REINE,17,11);
+    jeu->frelon = N;
     ajoute_colonie(jeu,N,17,11);
     ajoute_unite(N,rf);
     ajoute_unite(N,f1);
@@ -746,24 +753,45 @@ void initialisation_jeu(Grille* jeu){
 }
 
 
-
+//verification si il y a un combat sur le plateau a utiliser apres la fin d'un tour
+Point verif_combat(Grille jeu){
+  Unite *tmp;
+  for(int posx; posx<LIGNES; posx++){
+    for(int posy; posy<COLONNES; posy++){
+      tmp = jeu.plateau[posx][posy].occupant;
+      if(tmp == NULL) continue;
+      while(tmp->vsuiv != NULL){
+        tmp = tmp->vsuiv;
+      }
+      if(((jeu.plateau[posx][posy].colonie != NULL && jeu.plateau[posx][posy].colonie->camp == ABEILLE) || jeu.plateau[posx][posy].occupant->camp == ABEILLE) && ((jeu.plateau[posx][posy].colonie != NULL && jeu.plateau[posx][posy].colonie->camp == FRELONCAMP) || tmp->camp == FRELONCAMP)){
+        Point P = {posx,posy};
+        return P;
+      }
+    }
+  }
+  Point P = {-1,-1};
+  return P;
+}
 
 int main(){
   srand(time(NULL));
   Grille jeu;
-  
+  Point P;
   init_tab(jeu.plateau);
- 
   initialisation_jeu(&jeu);
-
   affichage(jeu);
   
-  /*int res;
+  char joueur_actuelle;
+  if(rand()%2 == 0)joueur_actuelle = ABEILLE;
+  else joueur_actuelle = FRELONCAMP;
+
+  while(jeu.abeille != NULL || jeu.frelon != NULL){
+  int res;
   do{
   res = combat(ESCADRON,FRELON);
   }while (res == 0);
   if(res > 0) printf("Abeille on gagner avec %d d'avance\n", res);
   else printf("Frelons on gagner avec %d\n", -res);
-  */
+  }
   return 0;
 }
