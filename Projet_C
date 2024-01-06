@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 // Dimensions de la grille en nombre de cases (origine en haut a gauche) :
 #define COLONNES 12
@@ -137,6 +138,16 @@ void affiche(Unite* liste){
   }
 }
 
+void affiche_occ(Unite* liste){
+  if(liste == NULL) printf("probleme");
+  else {
+    printf("%c\n",liste->type);
+    printf("%c\n",liste->vsuiv->type);
+    printf("%c\n",liste->vsuiv->vsuiv->type);
+    printf("%c\n",liste->vsuiv->vsuiv->vsuiv->type);
+  }
+}
+
 //affiche le tableau
 void affichage(Grille jeu){
   Unite *tmp;
@@ -230,88 +241,92 @@ Unite* creer_frelon(char frelon,int ruchex, int ruchey ){ /*Création de d'unit�
 //deplace une unité precise (PAS TESTER)
 void deplacer(Unite* creat){
   //j'ai preferé faire avec un switch, comme ca si on change la condition (genre on passe du scanf à un clique de la souris), on aura juste à changer la manière d'avoir les informations et pas le switch
-  printf("Ou voulez vous vous déplacez ? ( NO(Nord-Ouest), N(Nord), NE(Nord-Est), E(Est), SE(Sud-Est), S(Sud), SO(Sud-Ouest), O(Ouest))");
+  printf("Ou voulez vous vous déplacez ? ( NO(Nord-Ouest), N(Nord), NE(Nord-Est), E(Est), SE(Sud-Est), S(Sud), SO(Sud-Ouest), O(Ouest))\n");
   char deplacement[3] = "";
+  int res;
+  int tmpx=creat->posx;
+  int tmpy=creat->posy;
   do{
-  scanf("%s",deplacement);
-  }while(deplacement !="NO" || deplacement !="N" || deplacement !="NE" || deplacement !="E"|| deplacement !="SE" || deplacement !="S" || deplacement !="SO"|| deplacement !="O" );
-  int cpt=0;
-  //vérifie si le coup à bien été joué, si on décide de déplacer une unité, on la déplace obligatoirement
-  //on voit si la future position est bien dans le plateau de jeu
-  while(cpt==0){
-    int tmpx=creat->posx;
-    int tmpy=creat->posy;
-    if("NO" == deplacement){
-      if ((0<=tmpx-1 && tmpx-1<18) && (0<=tmpy-1 && tmpy-1<12)){
+    res = 0;
+    scanf("%s",deplacement);
+    res = strcmp(deplacement,"NO");
+    if(res == 0){
+       if ((0<=tmpx-1 && tmpx-1<18) && (0<=tmpy-1 && tmpy-1<12)){
         creat->posx = tmpx-1;
         creat->posy = tmpy-1;
-        cpt+=1;
+        break;
       } 
       else 
-        printf("Impossible d'accéder à cette endroit");
-      }
-      if ("N" == deplacement){
-        if (0<=tmpy-1 && tmpy-1<12){
-          creat->posy = tmpy-1;
-          cpt+=1;
-        } 
-        else 
-          printf("Impossible d'accéder à cette endroit");
-      } 
-      if ("NE" == deplacement){
-        if ((0<=tmpx+1 && tmpx+1<18) && (0<=tmpy-1 && tmpy-1<12)){
-          creat->posx = tmpx+1;
-          creat->posy = tmpy-1;
-          cpt+=1;
-        } 
-        else 
-          printf("Impossible d'accéder à cette endroit");
-      }
-      if ("E" == deplacement){
-        if (0<=tmpx+1 && tmpx+1<18){
-          creat->posx = tmpx+1;
-          cpt+=1;
-        } 
-        else 
-          printf("Impossible d'accéder à cette endroit");
-      }
-      break;
-    if ("SE" == deplacement){
-      if ((0<=tmpx+1 && tmpx+1<18) && (0<=tmpy+1 && tmpy+1<12)){
-        creat->posx = tmpx+1;
-        creat->posy = tmpy+1;
-        cpt+=1;
-      } 
-      else 
-        printf("Impossible d'accéder à cette endroit");
+        printf("Impossible d'accéder à cette endroit\nRéessayer : ");
     }
-    if ("S" == deplacement){
-      if (0<=tmpy+1 && tmpy+1<12){
-        creat->posy = tmpy+1;
-        cpt+=1;
-      } 
-      else 
-        printf("Impossible d'accéder à cette endroit");
-    }
-    if ("SO" == deplacement){
-      if ((0<=tmpx-1 && tmpx-1<18) && (0<=tmpy+1 && tmpy+1<12)){
-        creat->posx = tmpx-1;
-        creat->posy = tmpy+1;
-        cpt+=1;
-      } 
-      else 
-        printf("Impossible d'accéder à cette endroit");
-    }
-    if ("O" == deplacement){
+    res = strcmp(deplacement,"N");
+    if(res == 0){
       if (0<=tmpx-1 && tmpx-1<18){
-        creat->posx = tmpx-1;
-        cpt+=1;
-      } 
+          creat->posx = tmpx-1;
+          break;
+        } 
       else 
-        printf("Impossible d'accéder à cette endroit");
+        printf("Impossible d'accéder à cette endroit\nRéessayer : ");
     }
+    res = strcmp(deplacement,"NE");
+    if(res == 0){
+      if ((0<=tmpx-1 && tmpx-1<18) && (0<=tmpy+1 && tmpy+1<12)){
+          creat->posx = tmpx-1;
+          creat->posy = tmpy+1;
+          break;
+        } 
+      else 
+        printf("Impossible d'accéder à cette endroit\nRéessayer : ");
     }
-  }
+    res = strcmp(deplacement,"E");
+    if(res == 0){
+      if (0<=tmpy+1 && tmpy+1<12){
+          creat->posy = tmpy+1;
+          break;
+        } 
+      else 
+        printf("Impossible d'accéder à cette endroit\nRéessayer : ");
+    }
+    res = strcmp(deplacement,"SE");
+    if(res == 0){
+      if ((0<=tmpx+1 && tmpx+1<18) && (0<=tmpy+1 && tmpy+1<12)){
+          creat->posx = tmpx+1;
+          creat->posy = tmpy+1;
+          break;
+        } 
+      else 
+        printf("Impossible d'accéder à cette endroit\nRéessayer : ");
+    }
+    res = strcmp(deplacement,"S");
+    if(res == 0){
+      if (0<=tmpx+1 && tmpx+1<18){
+          creat->posx = tmpx+1;
+          break;
+        } 
+      else 
+        printf("Impossible d'accéder à cette endroit\nRéessayer : ");
+    }
+    res = strcmp(deplacement,"SO");
+    if(res == 0){
+      if ((0<=tmpx+1 && tmpx+1<18) && (0<=tmpy-1 && tmpy-1<12)){
+          creat->posx = tmpx+1;
+          creat->posy = tmpy-1;
+          break;
+        } 
+      else 
+        printf("Impossible d'accéder à cette endroit\nRéessayer : ");
+    }
+    res = strcmp(deplacement,"O");
+    if(res == 0){
+      if (0<=tmpy-1 && tmpy-1<12){
+          creat->posy = tmpy-1;
+          break;
+        } 
+      else 
+        printf("Impossible d'accéder à cette endroit\nRéessayer : ");
+    }
+  }while(1);
+}
 
 
 //pas oublier de quand la récolte est fini, reset la valeur de production
@@ -666,62 +681,6 @@ void ajoute_unite(Unite** Liste, Unite* new_occupant){
   if(tmp == NULL) *Liste = new_occupant;
   else {switch (new_occupant->type)
   {
-    case ESCADRON:
-      while (tmp->usuiv != NULL ){
-        tmp = tmp->usuiv;
-      }
-      tmp->usuiv = new_occupant;
-      new_occupant->uprec = tmp;
-
-    case GUERRIERE:
-      while(tmp->usuiv != NULL && (tmp->type == RUCHE || tmp->type == OUVRIERE || (tmp->type == REINE && tmp->camp == ABEILLE))){
-        tmp = tmp->usuiv;
-      }
-      if(tmp->usuiv == NULL && tmp->uprec == NULL){
-        if(tmp->type == RUCHE || tmp->type == OUVRIERE || (tmp->type == REINE && tmp->camp == ABEILLE)){
-          tmp->usuiv = new_occupant;
-          new_occupant->uprec = tmp;
-        }
-        else{
-          new_occupant->usuiv = tmp;
-          *Liste = new_occupant;
-        }
-      }
-      else if (tmp->usuiv == NULL)
-      {
-        if(tmp->type == RUCHE || tmp->type == OUVRIERE || (tmp->type == REINE && tmp->camp == ABEILLE)){
-          tmp->usuiv = new_occupant;
-          new_occupant->uprec = tmp;
-        }
-        else{
-          new_occupant->uprec = tmp->uprec;
-          new_occupant->usuiv = tmp;
-          new_occupant->uprec->usuiv = new_occupant;
-          tmp->uprec = new_occupant;
-        }
-      }
-      else if (tmp->uprec == NULL)
-      {
-        if(tmp->type == RUCHE || tmp->type == OUVRIERE || (tmp->type == REINE && tmp->camp == ABEILLE)){
-          new_occupant->usuiv = tmp->usuiv;
-          new_occupant->uprec = tmp;
-          new_occupant->usuiv->uprec = new_occupant;
-          tmp->usuiv = new_occupant;
-        }
-        else{
-          new_occupant->usuiv = tmp;
-          tmp->uprec = new_occupant;
-          *Liste = new_occupant;
-        }
-      }
-      else
-      {
-        new_occupant->usuiv = tmp;
-        new_occupant->uprec = tmp->uprec;
-        tmp->uprec->usuiv = new_occupant;
-        tmp->uprec = new_occupant;
-      }
-      break;
 
     case REINE:
       if(new_occupant->camp == ABEILLE){
@@ -772,8 +731,8 @@ void ajoute_unite(Unite** Liste, Unite* new_occupant){
         tmp->uprec->usuiv = new_occupant;
         tmp->uprec = new_occupant;
       }
-      }else 
-          while (tmp->usuiv != NULL && tmp->type == NID ){
+      }else {
+        while (tmp->usuiv != NULL && tmp->type == NID ){
           tmp = tmp->usuiv;
         }
         if(tmp->usuiv == NULL && tmp->uprec == NULL){
@@ -872,6 +831,66 @@ void ajoute_unite(Unite** Liste, Unite* new_occupant){
       }
       break;
 
+    case GUERRIERE:
+      while(tmp->usuiv != NULL && (tmp->type == RUCHE || tmp->type == OUVRIERE || (tmp->type == REINE && tmp->camp == ABEILLE))){
+        tmp = tmp->usuiv;
+      }
+      if(tmp->usuiv == NULL && tmp->uprec == NULL){
+        if(tmp->type == RUCHE || tmp->type == OUVRIERE || (tmp->type == REINE && tmp->camp == ABEILLE)){
+          tmp->usuiv = new_occupant;
+          new_occupant->uprec = tmp;
+        }
+        else{
+          new_occupant->usuiv = tmp;
+          *Liste = new_occupant;
+        }
+      }
+      else if (tmp->usuiv == NULL)
+      {
+        if(tmp->type == RUCHE || tmp->type == OUVRIERE || (tmp->type == REINE && tmp->camp == ABEILLE)){
+          tmp->usuiv = new_occupant;
+          new_occupant->uprec = tmp;
+        }
+        else{
+          new_occupant->uprec = tmp->uprec;
+          new_occupant->usuiv = tmp;
+          new_occupant->uprec->usuiv = new_occupant;
+          tmp->uprec = new_occupant;
+        }
+      }
+      else if (tmp->uprec == NULL)
+      {
+        if(tmp->type == RUCHE || tmp->type == OUVRIERE || (tmp->type == REINE && tmp->camp == ABEILLE)){
+          new_occupant->usuiv = tmp->usuiv;
+          new_occupant->uprec = tmp;
+          new_occupant->usuiv->uprec = new_occupant;
+          tmp->usuiv = new_occupant;
+        }
+        else{
+          new_occupant->usuiv = tmp;
+          tmp->uprec = new_occupant;
+          *Liste = new_occupant;
+        }
+      }
+      else
+      {
+        new_occupant->usuiv = tmp;
+        new_occupant->uprec = tmp->uprec;
+        tmp->uprec->usuiv = new_occupant;
+        tmp->uprec = new_occupant;
+      }
+      }
+      break;
+
+    case ESCADRON:
+      while (tmp->usuiv != NULL ){
+        tmp = tmp->usuiv;
+      }
+      tmp->usuiv = new_occupant;
+      new_occupant->uprec = tmp;
+      break;
+
+
     case FRELON:
       while (tmp->usuiv != NULL ){
         tmp = tmp->usuiv;
@@ -946,9 +965,9 @@ void enleve_occupant(Unite** liste, Unite* unite){//supprime un ocuppant d'une c
   else{
     unite->vprec->vsuiv = unite->vsuiv;
     unite->vsuiv->vprec = unite->vprec;
-    unite->vprec = NULL;
-    unite->vsuiv = NULL;
   }
+  unite->vprec = NULL;
+  unite->vsuiv = NULL;
 }
 
 void enleve_colonie(Unite** liste, Unite* unite){//supprime un ocuppant d'une case
@@ -976,19 +995,18 @@ void initialisation_jeu(Grille* jeu){
 
     jeu->abeille = R;
     ajoute_colonie(jeu,R,0,0);
-    ajoute_unite(&R,e);
-    ajoute_unite(&R,g);
+    ajoute_unite(&R,g);  
     ajoute_unite(&R,o);
     ajoute_unite(&R,ra);
-    affiche(R);
+    ajoute_unite(&R,e);
     R->toursrestant = 0;
     e->toursrestant = 0;
     g->toursrestant = 0;
     o->toursrestant = 0;
     ra->toursrestant = 0;
     ajoute_occupant(&jeu->plateau[0][0].occupant,ra);
-    ajoute_occupant(&jeu->plateau[0][0].occupant,o);
     ajoute_occupant(&jeu->plateau[0][0].occupant,g);
+    ajoute_occupant(&jeu->plateau[0][0].occupant,o);
     ajoute_occupant(&jeu->plateau[0][0].occupant,e);
     Unite *N = creer_frelon(NID,17,11);
     Unite *f1 = creer_frelon(FRELON,17,11);
@@ -1038,17 +1056,16 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
   switch(unit->type){
 
     case RUCHE :
-    
+    if(unit->toursrestant > 0){
+      printf("La Ruche ou Nid en case x = %d et y = %d\nNe peut pas encore crée de nouvelles unités attendez encore %d tours\n", unit->posx, unit->posy, unit->toursrestant);
+      break;
+    }
     do{
-    printf("Voulez vous crée une nouvelle unité ?(o ou n)\n");
+    printf("La Ruche ou Nid en case x = %d et y = %d\nVoulez vous crée une nouvelle unité ?(o ou n)\n", unit->posx, unit->posy);
     scanf(" %c",&reponse);
     }while(reponse != 'o' && reponse != 'n');
     if(reponse == 'o'){
-      if(unit->toursrestant > 0){
-        printf("Vous ne pouvez pas crée une unité\n");
-        break;
-      }
-      else if(unit->camp == ABEILLE){
+      if(unit->camp == ABEILLE){
         do{
           printf("Quel unité voulez vous crée ?('r' pour Reine, 'o' pour ouvriere, 'g' pour gueriere, 'e' pour Escadron ou 'q' pour quitter)\n");
           scanf(" %c",&reponse);
@@ -1060,11 +1077,8 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
               }
               else{
                 Unite* c = creer_abeille(reponse,unit->posx,unit->posy);
-                fprintf(stderr,"Pb1");
                 ajoute_occupant(&jeu->plateau[unit->posx][unit->posy].occupant,c);
-                fprintf(stderr,"Pb2");
                 ajoute_unite(&jeu->plateau[unit->posx][unit->posy].colonie,c);
-                fprintf(stderr,"Pb3");
                 jeu->ressourcesAbeille -= CREINEA;
                 unit->temps = TREINEA;
                 unit->toursrestant = TREINEA;
@@ -1102,6 +1116,7 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
               break;
 
             case 'e':
+            fprintf(stderr,"pb0");
               if(jeu->ressourcesAbeille < CESCADRON){
                 printf("Probleme pas assez de Pollen\n");
                 reponse = ' '; 
@@ -1165,6 +1180,11 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
     break;
 
     case REINE:
+    if(unit->toursrestant > 0){
+      printf("La Reine du camp '%c en case x = %d et y = %d\nNe peut pas encore crée de nouvelles unités ou se deplacer attendez encore %d tours\n", unit->camp, unit->posx, unit->posy, unit->toursrestant);
+      break;
+    }
+    printf("La Reine du camp '%c' en case x = %d et y = %d\n", unit->camp, unit->posx, unit->posy);
     printf("1) Se deplacer vers une case voisine. \n2) Fonder un Nid ou une Ruche.\n3) Passer le tour.\n4) Detruire unité.\n");
     do{
     scanf("%d",&res);
@@ -1203,7 +1223,11 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
     break;
 
     case OUVRIERE:
-    if(unit->production == RECOLTE) break;
+    if(unit->toursrestant > 0){
+      printf("L'Ouvrière en case x = %d et y = %d\nEst en train de recuperer du pollen elle ne peut pas se deplacer attendez encore %d tours\n", unit->posx, unit->posy, unit->toursrestant);
+      break;
+    }
+    printf("L'Ouvrière en case x = %d et y = %d\n", unit->posx, unit->posy);
     printf("1) Se deplacer vers une case voisine. \n2) Récolter du pollen (4 tours)\n3) Detruire unité.\n");
     do{
     scanf("%d",&res);
@@ -1229,6 +1253,11 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
     break;
 
     default:
+    if(unit->toursrestant > 0){
+      printf("L'Unité de type '%c' en case x = %d et y = %d\nNe peut pas se deplacer attendez encore %d tours\n", unit->type, unit->posx, unit->posy, unit->toursrestant);
+      break;
+    }
+    printf("L'Unité de type '%c' en case x = %d et y = %d\n", unit->type, unit->posx, unit->posy);
     printf("1) Se deplacer vers une case voisine. \n2) Passer le tour.\n3) Detruire unité.\n");
     do{
     scanf("%d",&res);
@@ -1261,13 +1290,12 @@ int main(){
   init_tab(jeu.plateau);
   initialisation_jeu(&jeu);
   affichage(jeu);
-  affiche(jeu.abeille);
   char joueur_actuelle;
   if(rand()%2 == 0)joueur_actuelle = ABEILLE;
   else joueur_actuelle = FRELONCAMP;
 
   //while(jeu.abeille != NULL || jeu.frelon != NULL){}
-    
-  question(jeu.plateau[0][0].colonie,&jeu);
+  question(jeu.plateau[0][0].occupant,&jeu);
+  affichage(jeu);
   return 0;
 }
