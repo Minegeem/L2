@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <MLV/MLV_all.h> 
 
 // Dimensions de la grille en nombre de cases (origine en haut a gauche) :
 #define COLONNES 12
@@ -457,7 +458,7 @@ void ajoute_colonie(Grille* jeu, Unite* new_occupant, int posx, int posy){
 
 
 
-//ajoute une Unité a une case du plateau
+//ajoute une Unité a une case du plateau (de manière triée)
 void ajoute_occupant(Unite** Liste, Unite* new_occupant){    
   Unite* tmp = *Liste;
   if(tmp == NULL) *Liste = new_occupant;
@@ -1116,7 +1117,7 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
               break;
 
             case 'e':
-            fprintf(stderr,"pb0");
+            fprintf(stderr,"pb0");// on garde ?
               if(jeu->ressourcesAbeille < CESCADRON){
                 printf("Probleme pas assez de Pollen\n");
                 reponse = ' '; 
@@ -1280,6 +1281,116 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
   }
 }
 
+void affiche_case(int sizex,int sizey,int reine_abeille, int reine_frelon, int ouvriere, int maison, int frelon, int guerriere, int escadron ){
+    //valeurs macabres du style 27 et 18 pck 60 trop grand donc tout est basé en fonction de 54 
+    //(multiple inferieur de 60 divisible par 2 et 3 pour éviter les nombres à virgules)
+    
+    //reine abeille (jaune)
+    if(reine_abeille) MLV_draw_filled_rectangle( sizex, sizey, 27, 18, MLV_COLOR_YELLOW );
+    else MLV_draw_filled_rectangle( sizex, sizey, 27, 18, MLV_COLOR_DARKGREEN );
+    //reine frelon (bleu fonce)
+    if(reine_frelon) MLV_draw_filled_rectangle( sizex+27, sizey, 27, 18, MLV_COLOR_DARKBLUE );
+    else MLV_draw_filled_rectangle( sizex+27, sizey, 27, 18, MLV_COLOR_DARKGREEN );
+    //ouvriere (jaune clair)
+    if(ouvriere) MLV_draw_filled_rectangle( sizex, sizey+18, 18, 18, MLV_COLOR_LIGHTYELLOW );
+    else MLV_draw_filled_rectangle( sizex, sizey+18, 18, 18, MLV_COLOR_DARKGREEN );
+    //Ruche/Nid (noir)
+    if(maison) MLV_draw_filled_rectangle( sizex+18, sizey+18, 18, 18, MLV_COLOR_BLACK );
+    else MLV_draw_filled_rectangle( sizex+18, sizey+18, 18, 18, MLV_COLOR_DARKGREEN );
+    //Frelon (bleu)
+    if(frelon) MLV_draw_filled_rectangle( sizex+36, sizey+18, 18, 18, MLV_COLOR_BLUE );
+    else MLV_draw_filled_rectangle( sizex+36, sizey+18, 18, 18, MLV_COLOR_DARKGREEN );
+    //Guerriere (orange)
+    if(guerriere) MLV_draw_filled_rectangle( sizex, sizey+36, 27, 18, MLV_COLOR_ORANGE );
+    else MLV_draw_filled_rectangle( sizex, sizey+36, 27, 18, MLV_COLOR_DARKGREEN );
+    //Escadron (rouge)
+    if(escadron) MLV_draw_filled_rectangle( sizex+27, sizey+36, 27, 18, MLV_COLOR_RED );
+    else MLV_draw_filled_rectangle( sizex+27, sizey+36, 27, 18, MLV_COLOR_DARKGREEN );
+}
+
+void grille(int lig, int col){
+    int reine_abeille=0;
+    int reine_frelon=0;
+    int ouvriere=0;
+    int maison=0;
+    int frelon=0;
+    int guerriere=0;
+    int escadron=0;
+    for(int i=600;i<lig;i+=54){
+        for(int j=20;j<col;j+=54){
+            reine_abeille=reine_frelon=ouvriere=maison=frelon=guerriere=escadron=0;
+            //parcourt la case du plateau en question et cherche le type de ses 
+            //occupants ou le camp de ses colonies puis incremente les variables en consequences
+            for(;jeu->plateau[(i-600)%54][(j-20)%54].occupant->type==NULL;jeu->plateau[(i-600)%54][(j-20)%54].occupant->vsuiv){
+                switch(jeu->plateau[(i-600)%54][(j-20)%54].occupant->type){
+                    case REINE:
+                        if(jeu->plateau[(i-600)%54][(j-20)%54].occupant->camp==ABEILLE) reine_abeille=1;
+                        else reine_frelon=1;
+                        break;
+                    case OUVRIERE:
+                        ouvriere=1;
+                        break;
+                    case FRELON:
+                        frelon=1;
+                        break;
+                    case GUERRIERE:
+                        guerriere=1;
+                        break;
+                    case ESCADRON:
+                        escadron=1;
+                        break;
+                    }
+            for(;jeu->plateau[(i-600)%54][(j-20)%54].colonie->type==NULL;jeu->plateau[(i-600)%54][(j-20)%54].colonie->vsuiv){
+                switch(jeu->plateau[(i-600)%54][(j-20)%54].colonie->camp){
+                    case FRELONCAMP:
+                        maison=1;
+                        break;
+                    case ABEILLE:
+                        maison=1;
+                        break;
+                    }
+                }
+            affiche_case(i,j,reine_abeille,reine_frelon,ouvriere,maison,frelon,guerriere,escadron);
+        }}}
+    MLV_update_window();
+    }
+
+void menu(char* pos, char* action){
+    //affichage des coordonnées de l'unite en cours (250,225)
+    MLV_draw_adapted_text_box(140,140,"Coordonnées de l'unite en cours:",10,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    //case pour faire une action (250,350)
+    MLV_draw_adapted_text_box(150,275,"Faire une action" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    // deplacer (250,475)
+    MLV_draw_adapted_text_box(150,400,"Se Deplacer" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    //skip (250,600)
+    MLV_draw_adapted_text_box(150,525,"Passer le tour" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    // action en cours (250,725)
+    MLV_draw_adapted_text_box(150,650,"Détruire une unité" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    // Détruire une unité (250,850)
+    MLV_draw_adapted_text_box(140,890,"Action en cours:" , 10,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    MLV_draw_text(390,150,pos,MLV_COLOR_RED);// x à revoir en fonction de l'emplacement du texte
+    MLV_draw_text(280,900,action,MLV_COLOR_RED); // x à revoir en fonction de l'emplacement du texte
+    MLV_update_window();
+    }
+
+void partie(char* tour, char* clan){
+    //affichage des coordonnées de l'unite en cours (250,225)
+    MLV_draw_adapted_text_box(1510,140,"Nombre de tour:",10,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    //case pour faire une action (250,350)
+    MLV_draw_adapted_text_box(1520,275,"Sauvegarder la Partie" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    // deplacer (250,475)
+    MLV_draw_adapted_text_box(1520,400,"Charger la sauvegarde" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    //skip (250,600)
+    MLV_draw_adapted_text_box(1520,525,"Quitter la partie" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    // action en cours (250,725)
+    MLV_draw_adapted_text_box(1520,650,"Fin du tour" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    // Détruire une unité (250,850)
+    MLV_draw_adapted_text_box(1510,890,"Clan du joueur en cours:" , 10,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
+    MLV_draw_text(1650,150,tour,MLV_COLOR_RED);// x à revoir en fonction de l'emplacement du texte
+    MLV_draw_text(1700,900,clan,MLV_COLOR_RED); // x à revoir en fonction de l'emplacement du texte
+    MLV_update_window();
+    }
+
 int main(){
   srand(time(NULL));
   
@@ -1293,6 +1404,15 @@ int main(){
   char joueur_actuelle;
   if(rand()%2 == 0)joueur_actuelle = ABEILLE;
   else joueur_actuelle = FRELONCAMP;
+
+  //test pour l'affichage graphique
+  MLV_create_full_screen_window("Kingdom","Kingdom",1920,1080);
+  grille(1272,972);
+  MLV_wait_seconds(1);
+  menu("kanki","ousen");
+  partie("shin","kyoukai");
+  MLV_wait_seconds(30);
+  MLV_update_window();
 
   //while(jeu.abeille != NULL || jeu.frelon != NULL){}
   question(jeu.plateau[0][0].occupant,&jeu);
