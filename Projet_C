@@ -1421,7 +1421,7 @@ void affiche_case(int sizex,int sizey,int reine_abeille, int reine_frelon, int o
     else MLV_draw_filled_rectangle( sizex+27, sizey+36, 27, 18, MLV_COLOR_DARKGREEN );
 }
 
-void grille(int lig, int col){
+void grille(int lig, int col,Grille *jeu){
     int reine_abeille=0;
     int reine_frelon=0;
     int ouvriere=0;
@@ -1504,6 +1504,59 @@ void partie(char* tour, char* clan){
     MLV_update_window();
     }
 
+void charger_partie(Grille *jeu, char* save,char joueur_actuelle) {
+    FILE *fichier;
+    fichier = fopen("sauvegarde_partie.txt", "r"); 
+    char ligne[20] = "";
+    if (fichier == NULL) {
+        printf("Aucune sauvegarde trouvée.\nNous commencont une nouvelle partie.\n");
+    } else {    
+        //fscanf(fichier, "%d %d", &partie.niveau, &partie.score);
+        fgets(ligne, sizeof(ligne), fichier);
+        scanf(fichier, "%c %d %d\n", joueur_actuelle, jeu->ressourcesAbeille, jeu->ressourcesFrelon);
+        while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
+        printf("%s", ligne); // Affiche chaque ligne lue depuis le fichier
+    }
+
+        fclose(fichier); 
+    }
+}
+    
+void sauvegarder_partie(Grille *jeu,char joueur_actuelle, char* save) {
+    FILE *fichier;
+    Unite* tmp,*tmp2;
+    fichier = fopen(save,"w");
+
+    if (fichier == NULL) {
+        printf("Erreur lors de l'ouverture du fichier de sauvegarde.\n");
+    }
+    else {
+        if(joueur_actuelle == ABEILLE){
+          fprintf(fichier, "%c %d %d\n", joueur_actuelle, jeu->ressourcesAbeille, jeu->ressourcesFrelon);
+        }
+        else fprintf(fichier, "%c %d %d\n", joueur_actuelle, jeu->ressourcesFrelon, jeu->ressourcesAbeille);
+        tmp = jeu->frelon;
+        while(tmp != NULL){
+          tmp2 = tmp;
+          while(tmp2 !=NULL){
+            fprintf(fichier, "%c %c %d %d %c %d\n", tmp2->camp,tmp2->type,tmp2->posx,tmp2->posy,tmp2->production,tmp2->toursrestant);
+            tmp2 = tmp2->usuiv;
+          }
+          tmp = tmp->colsuiv;
+        }
+        tmp = jeu->abeille;
+        while(tmp != NULL){
+          tmp2 = tmp;
+          while(tmp2 !=NULL){
+            fprintf(fichier, "%c %c %d %d %c %d\n", tmp2->camp,tmp2->type,tmp2->posx,tmp2->posy,tmp2->production,tmp2->toursrestant);
+            tmp2 = tmp2->usuiv;
+            }
+            tmp = tmp->colsuiv;
+        }
+    }
+    fclose(fichier); 
+}
+
 int main(){
   srand(time(NULL));
   
@@ -1516,10 +1569,15 @@ int main(){
   jeu.frelon = NULL;
   init_tab(jeu.plateau);
   initialisation_jeu(&jeu);
-  char beginner;
+  char beginner, save;
   if(rand()%2 == 0)beginner = ABEILLE;
   else beginner = FRELONCAMP;
   printf("C'est le joueur %c qui commence.\n",beginner);
+  do{
+    printf("Voulez vous sauvegardez ? (o où n)");
+    scanf("%c",save);
+  }while(save = 'o' || save == 'n');
+
 /*
   while(jeu.abeille != NULL && jeu.frelon != NULL){
     tour(&jeu,beginner);
@@ -1551,7 +1609,7 @@ int main(){
 
   //test pour l'affichage graphique
   MLV_create_full_screen_window("Kingdom","Kingdom",1920,1080);
-  grille(1272,972);
+  grille(1272,972,&jeu);
   MLV_wait_seconds(1);
   menu("kanki","ousen");
   partie("shin","kyoukai");
