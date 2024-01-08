@@ -1434,7 +1434,7 @@ void grille(int lig, int col){
             reine_abeille=reine_frelon=ouvriere=maison=frelon=guerriere=escadron=0;
             //parcourt la case du plateau en question et cherche le type de ses 
             //occupants ou le camp de ses colonies puis incremente les variables en consequences
-            for(;jeu->plateau[(i-600)%54][(j-20)%54].occupant->type==NULL;jeu->plateau[(i-600)%54][(j-20)%54].occupant->vsuiv){ //Trés bizarre
+            for(;jeu->plateau[(i-600)%54][(j-20)%54].occupant->type!=NULL;jeu->plateau[(i-600)%54][(j-20)%54].occupant->vsuiv){ //Trés bizarre
                 switch(jeu->plateau[(i-600)%54][(j-20)%54].occupant->type){
                     case REINE:
                         if(jeu->plateau[(i-600)%54][(j-20)%54].occupant->camp==ABEILLE) reine_abeille=1;
@@ -1543,9 +1543,9 @@ int main(){
       tmp = tmp->colsuiv;
     }
     if(jeu.abeille == NULL)
-      printf("Les Frelons ont gagner.\n");
+      printf("Les Frelons ont gagnés.\n");
     if(jeu.frelon == NULL)
-      printf("Les Abeilles ont perdu.\n");
+      printf("Les Abeilles ont gagnées.\n");
     jeu.tour++;
   }*/
 
