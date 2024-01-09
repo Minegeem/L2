@@ -195,23 +195,23 @@ void affichage(Grille jeu){
 
 
 //creer un type d'abeille (ruche,reine, ouvriere, gueriere,escadron)
-Unite* creer_abeille(char abeille , int ruchex ,int ruchey){ /*Création d'unité coté Abeilles*/
+Unite* creer_abeille(char abeille , int ruchex ,int ruchey,char production ,int toursrestant){ /*Création d'unité coté Abeilles*/
     Unite* nouvelle_abeille;
     switch(abeille){
         case 'R':
-        nouvelle_abeille = piece(ABEILLE,RUCHE,0,ruchex,ruchey,' ',1,1);
+        nouvelle_abeille = piece(ABEILLE,RUCHE,0,ruchex,ruchey,production,1,toursrestant);
         break;
         case 'r':
-        nouvelle_abeille = piece(ABEILLE,REINE,FREINE,ruchex,ruchey,' ',TREINEA,TREINEA);
+        nouvelle_abeille = piece(ABEILLE,REINE,FREINE,ruchex,ruchey,production,TREINEA,toursrestant);
         break;
         case 'o':
-        nouvelle_abeille = piece(ABEILLE,OUVRIERE,FOUVRIERE,ruchex,ruchey,' ',TOUVRIERE,TOUVRIERE);
+        nouvelle_abeille = piece(ABEILLE,OUVRIERE,FOUVRIERE,ruchex,ruchey,production,TOUVRIERE,toursrestant);
         break;
         case 'g':
-        nouvelle_abeille = piece(ABEILLE,GUERRIERE,FGUERRIERE,ruchex,ruchey,' ',TGUERRIERE,TGUERRIERE);
+        nouvelle_abeille = piece(ABEILLE,GUERRIERE,FGUERRIERE,ruchex,ruchey,production,TGUERRIERE,toursrestant);
         break;
         case 'e':
-        nouvelle_abeille = piece(ABEILLE,ESCADRON,FESCADRON,ruchex,ruchey,' ',TESCADRON,TESCADRON);
+        nouvelle_abeille = piece(ABEILLE,ESCADRON,FESCADRON,ruchex,ruchey,production,TESCADRON,toursrestant);
         break;
     }
     return nouvelle_abeille;
@@ -219,17 +219,17 @@ Unite* creer_abeille(char abeille , int ruchex ,int ruchey){ /*Création d'unit�
 
 
 //creer des frelons(nid,frelons,reine)
-Unite* creer_frelon(char frelon,int ruchex, int ruchey ){ /*Création de d'unité coté Frelons*/
+Unite* creer_frelon(char frelon,int ruchex, int ruchey,char production,int toursrestant){ /*Création de d'unité coté Frelons*/
     Unite* nouveau_frelon;
     switch(frelon){
         case 'N':
-        nouveau_frelon = piece(FRELONCAMP,NID,0,ruchex,ruchey,' ',1,1);
+        nouveau_frelon = piece(FRELONCAMP,NID,0,ruchex,ruchey,production,1,toursrestant);
         break;
         case 'r':
-        nouveau_frelon = piece(FRELONCAMP,REINE,FREINE,ruchex,ruchey,' ',TREINEF,TREINEF);
+        nouveau_frelon = piece(FRELONCAMP,REINE,FREINE,ruchex,ruchey,production,TREINEF,toursrestant);
         break;
         case 'f':
-        nouveau_frelon = piece(FRELONCAMP,FRELON,FFRELON,ruchex,ruchey,' ',TFRELON,TFRELON);
+        nouveau_frelon = piece(FRELONCAMP,FRELON,FFRELON,ruchex,ruchey,production,TFRELON,toursrestant);
         break;
     }
     return nouveau_frelon;
@@ -903,36 +903,28 @@ void enleve_colonie(Unite** liste, Unite* unite){//supprime une unité d'une col
 
 //initialisation du jeu au depart
 void initialisation_jeu(Grille* jeu){
-    Unite *R = creer_abeille(RUCHE,0,0);
-    Unite *g = creer_abeille(GUERRIERE,0,0);
-    Unite *o = creer_abeille(OUVRIERE,0,0);
-    Unite *ra = creer_abeille(REINE,0,0); 
+    Unite *R = creer_abeille(RUCHE,0,0,' ',0);
+    Unite *g = creer_abeille(GUERRIERE,0,0,' ',0);
+    Unite *o = creer_abeille(OUVRIERE,0,0,' ',0);
+    Unite *ra = creer_abeille(REINE,0,0,' ',0); 
     ajoute_colonie(jeu,R,0,0);
     ajoute_unite(&R,g);  
     ajoute_unite(&R,o);
     ajoute_unite(&R,ra);
-    R->toursrestant = 0;
-    g->toursrestant = 0;
-    o->toursrestant = 0;
-    ra->toursrestant = 0;
     ajoute_occupant(&jeu->plateau[0][0].occupant,ra);
     ajoute_occupant(&jeu->plateau[0][0].occupant,g);
     ajoute_occupant(&jeu->plateau[0][0].occupant,o);
-    Unite *N = creer_frelon(NID,1,1);
-    Unite *f1 = creer_frelon(FRELON,1,1);
-    Unite *f2 = creer_frelon(FRELON,1,1);
-    Unite *rf = creer_frelon(REINE,1,1);
-    N->toursrestant = 0;
-    f1->toursrestant = 0;
-    f2->toursrestant = 0;
-    rf->toursrestant = 0;
-    ajoute_colonie(jeu,N,1,1);
+    Unite *N = creer_frelon(NID,17,11,' ',0);
+    Unite *f1 = creer_frelon(FRELON,17,11,' ',0);
+    Unite *f2 = creer_frelon(FRELON,17,11,' ',0);
+    Unite *rf = creer_frelon(REINE,17,11,' ',0);
+    ajoute_colonie(jeu,N,17,11);
     ajoute_unite(&N,rf);
     ajoute_unite(&N,f1);
     ajoute_unite(&N,f2);
-    ajoute_occupant(&jeu->plateau[1][1].occupant,f1);
-    ajoute_occupant(&jeu->plateau[1][1].occupant,f2);
-    ajoute_occupant(&jeu->plateau[1][1].occupant,rf);
+    ajoute_occupant(&jeu->plateau[17][11].occupant,f1);
+    ajoute_occupant(&jeu->plateau[17][11].occupant,f2);
+    ajoute_occupant(&jeu->plateau[17][11].occupant,rf);
     jeu->ressourcesAbeille = 10;
     jeu->ressourcesFrelon = 10;   
 }
@@ -985,7 +977,7 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
                 reponse = ' '; 
               }
               else{
-                Unite* c = creer_abeille(reponse,unit->posx,unit->posy);
+                Unite* c = creer_abeille(reponse,unit->posx,unit->posy,' ',TREINEA);
                 ajoute_occupant(&jeu->plateau[unit->posx][unit->posy].occupant,c);
                 ajoute_unite(&jeu->plateau[unit->posx][unit->posy].colonie,c);
                 jeu->ressourcesAbeille -= CREINEA;
@@ -1000,7 +992,7 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
                 reponse = ' '; 
               }
               else{
-                Unite* c = creer_abeille(reponse,unit->posx,unit->posy);
+                Unite* c = creer_abeille(reponse,unit->posx,unit->posy,' ',TOUVRIERE);
                 ajoute_occupant(&jeu->plateau[unit->posx][unit->posy].occupant,c);
                 ajoute_unite(&jeu->plateau[unit->posx][unit->posy].colonie,c);
                 jeu->ressourcesAbeille -= COUVRIERE;
@@ -1015,7 +1007,7 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
                 reponse = ' '; 
               }
               else{
-                Unite* c = creer_abeille(reponse,unit->posx,unit->posy);
+                Unite* c = creer_abeille(reponse,unit->posx,unit->posy,' ',TGUERRIERE);
                 ajoute_occupant(&jeu->plateau[unit->posx][unit->posy].occupant,c);
                 ajoute_unite(&jeu->plateau[unit->posx][unit->posy].colonie,c);
                 jeu->ressourcesAbeille -= CGUERRIERE;
@@ -1030,7 +1022,7 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
                 reponse = ' '; 
               }
               else{
-                Unite* c = creer_abeille(reponse,unit->posx,unit->posy);
+                Unite* c = creer_abeille(reponse,unit->posx,unit->posy,' ', TESCADRON);
                 ajoute_occupant(&jeu->plateau[unit->posx][unit->posy].occupant,c);
                 ajoute_unite(&jeu->plateau[unit->posx][unit->posy].colonie,c);
                 jeu->ressourcesAbeille -= CESCADRON;
@@ -1066,7 +1058,7 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
               reponse = ' '; 
             }
             else{
-              Unite* c = creer_frelon(reponse,unit->posx,unit->posy);
+              Unite* c = creer_frelon(reponse,unit->posx,unit->posy,' ',TREINEF);
               ajoute_occupant(&jeu->plateau[unit->posx][unit->posy].occupant,c);
               ajoute_unite(&jeu->plateau[unit->posx][unit->posy].colonie,c);
               jeu->ressourcesFrelon -= CREINEF;
@@ -1081,7 +1073,7 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
               reponse = ' '; 
             }
             else{
-              Unite* c = creer_frelon(reponse,unit->posx,unit->posy);
+              Unite* c = creer_frelon(reponse,unit->posx,unit->posy,' ',TFRELON);
               ajoute_occupant(&jeu->plateau[unit->posx][unit->posy].occupant,c);
               ajoute_unite(&jeu->plateau[unit->posx][unit->posy].colonie,c);
               jeu->ressourcesAbeille -= CFRELON;
@@ -1124,9 +1116,9 @@ void question(Unite* unit, Grille* jeu){ //pose toute les question du jeux et le
         }
         else {
           if(unit->camp == ABEILLE)
-            R = creer_abeille(RUCHE,unit->posx,unit->posy);
+            R = creer_abeille(RUCHE,unit->posx,unit->posy,' ',1);
           if(unit->camp == FRELONCAMP)
-            R = creer_frelon(NID,unit->posx,unit->posy);
+            R = creer_frelon(NID,unit->posx,unit->posy,' ',1);
           ajoute_colonie(jeu,R,unit->posx,unit->posy);
           tmp = unit;
           while(tmp->uprec != NULL){
@@ -1276,15 +1268,15 @@ void tour(Grille* jeu,char beginner){
   
 }
 
-void combat_final(Grille jeu){
-  Point P = verif_combat(jeu);
+void combat_final(Grille* jeu){
+  Point P = verif_combat(*jeu);
   Unite* frelon,*col_frelon,*col_abeille,*abeille;
   int res_combat = 0;
   while(P.x != -1){
-      frelon = jeu.plateau[P.x][P.y].occupant;
-      col_frelon = jeu.plateau[P.x][P.y].occupant;
-      col_abeille = jeu.plateau[P.x][P.y].occupant;
-      abeille = jeu.plateau[P.x][P.y].occupant;
+      frelon = jeu->plateau[P.x][P.y].occupant;
+      col_frelon = jeu->plateau[P.x][P.y].occupant;
+      col_abeille = jeu->plateau[P.x][P.y].occupant;
+      abeille = jeu->plateau[P.x][P.y].occupant;
       while(frelon->vsuiv != NULL) frelon = frelon->vsuiv;
       while(col_abeille->uprec != NULL) col_abeille = col_abeille->uprec;
       while(col_frelon->uprec != NULL) col_frelon = col_frelon->uprec;
@@ -1297,7 +1289,7 @@ void combat_final(Grille jeu){
         if (res_combat > 0){//abeille gagne
             printf("L'unité %c a gagner contre l'unite %c\n",abeille->type,frelon->type);
             enleve_colonie(&col_frelon,frelon);
-            enleve_occupant(&jeu.plateau[P.x][P.y].occupant,frelon);
+            enleve_occupant(&jeu->plateau[P.x][P.y].occupant,frelon);
             free(frelon);
             
           } 
@@ -1305,41 +1297,41 @@ void combat_final(Grille jeu){
           printf("L'unité %c a gagner contre l'unite %c\n",frelon->type,abeille->type);
           switch(abeille->type){
             case REINE:
-            jeu.ressourcesFrelon += CREINEA;
+            jeu->ressourcesFrelon += CREINEA;
             break;
             case GUERRIERE:
-            jeu.ressourcesFrelon += CGUERRIERE;
+            jeu->ressourcesFrelon += CGUERRIERE;
             break;
             case OUVRIERE:
-            jeu.ressourcesFrelon += COUVRIERE;
+            jeu->ressourcesFrelon += COUVRIERE;
             break;
             case ESCADRON:
-            jeu.ressourcesFrelon += CESCADRON;
+            jeu->ressourcesFrelon += CESCADRON;
             break;
           }
           enleve_colonie(&col_abeille,abeille);
-          enleve_occupant(&jeu.plateau[P.x][P.y].occupant,abeille);
+          enleve_occupant(&jeu->plateau[P.x][P.y].occupant,abeille);
           free(abeille);
         }
       }
 
-      else if(jeu.plateau[P.x][P.y].colonie->type == RUCHE && frelon->camp == FRELONCAMP){
+      else if(jeu->plateau[P.x][P.y].colonie->type == RUCHE && frelon->camp == FRELONCAMP){
         printf("L'unité %c a gagner contre l'unite 'R'\n",frelon->type);
-        abeille = jeu.plateau[P.x][P.y].colonie->usuiv;
-        if(jeu.plateau[P.x][P.y].colonie->colprec == NULL && jeu.plateau[P.x][P.y].colonie->colsuiv == NULL){
-          jeu.abeille = NULL;
+        abeille = jeu->plateau[P.x][P.y].colonie->usuiv;
+        if(jeu->plateau[P.x][P.y].colonie->colprec == NULL && jeu->plateau[P.x][P.y].colonie->colsuiv == NULL){
+          jeu->abeille = NULL;
           }
-        else if(jeu.plateau[P.x][P.y].colonie->colprec == NULL){
-            jeu.abeille = jeu.plateau[P.x][P.y].colonie->colsuiv;
+        else if(jeu->plateau[P.x][P.y].colonie->colprec == NULL){
+            jeu->abeille = jeu->plateau[P.x][P.y].colonie->colsuiv;
           }
-        else if(jeu.plateau[P.x][P.y].colonie->colsuiv == NULL){
-          jeu.plateau[P.x][P.y].colonie->colprec->colsuiv = NULL;
+        else if(jeu->plateau[P.x][P.y].colonie->colsuiv == NULL){
+          jeu->plateau[P.x][P.y].colonie->colprec->colsuiv = NULL;
         }
         else{
-          jeu.plateau[P.x][P.y].colonie->colprec->colsuiv = jeu.plateau[P.x][P.y].colonie->colsuiv;
-          jeu.plateau[P.x][P.y].colonie->colsuiv->colprec = jeu.plateau[P.x][P.y].colonie->colprec;
+          jeu->plateau[P.x][P.y].colonie->colprec->colsuiv = jeu->plateau[P.x][P.y].colonie->colsuiv;
+          jeu->plateau[P.x][P.y].colonie->colsuiv->colprec = jeu->plateau[P.x][P.y].colonie->colprec;
         }
-        abeille =jeu.plateau[P.x][P.y].colonie->usuiv;
+        abeille =jeu->plateau[P.x][P.y].colonie->usuiv;
         if(abeille != NULL){
           Unite *tmp;
           while (abeille != NULL)
@@ -1349,7 +1341,7 @@ void combat_final(Grille jeu){
               if(abeille->usuiv == NULL){
                 enleve_occupant(&tmp,abeille);
                 free(abeille);
-                jeu.plateau[P.x][P.y].colonie = NULL;
+                jeu->plateau[P.x][P.y].colonie = NULL;
                 abeille = NULL;
               }
               else{
@@ -1359,17 +1351,17 @@ void combat_final(Grille jeu){
               }
             }
         }
-        else free(jeu.plateau[P.x][P.y].colonie);
-        Unite* N = creer_frelon(NID,P.x,P.y);
-        ajoute_colonie(&jeu,N,P.x,P.y);
+        else free(jeu->plateau[P.x][P.y].colonie);
+        Unite* N = creer_frelon(NID,P.x,P.y,' ',1);
+        ajoute_colonie(jeu,N,P.x,P.y);
         enleve_colonie(&col_frelon,frelon);
         ajoute_unite(&N,frelon);
       }
       else{
         printf("L'unité %c a gagner contre l'unite 'N'\n",abeille->type);
-        frelon = jeu.plateau[P.x][P.y].colonie->usuiv;
+        frelon = jeu->plateau[P.x][P.y].colonie->usuiv;
         if(frelon->uprec->colprec == NULL){
-          jeu.frelon = frelon->uprec->colsuiv;
+          jeu->frelon = frelon->uprec->colsuiv;
         }
         free(frelon->uprec);
         Unite *tmp;
@@ -1380,7 +1372,7 @@ void combat_final(Grille jeu){
             if(frelon->usuiv == NULL){
               enleve_occupant(&tmp,frelon);
               free(frelon);
-              jeu.plateau[P.x][P.y].colonie = NULL;
+              jeu->plateau[P.x][P.y].colonie = NULL;
               frelon = NULL;
             }
             else{
@@ -1390,133 +1382,45 @@ void combat_final(Grille jeu){
             }
           }
       }
-      P = verif_combat(jeu);
+      P = verif_combat(*jeu);
     }
 }
 
-void affiche_case(int sizex,int sizey,int reine_abeille, int reine_frelon, int ouvriere, int maison, int frelon, int guerriere, int escadron ){
-    //valeurs macabres du style 27 et 18 pck 60 trop grand donc tout est basé en fonction de 54 
-    //(multiple inferieur de 60 divisible par 2 et 3 pour éviter les nombres à virgules)
-    
-    //reine abeille (jaune)
-    if(reine_abeille) MLV_draw_filled_rectangle( sizex, sizey, 27, 18, MLV_COLOR_YELLOW );
-    else MLV_draw_filled_rectangle( sizex, sizey, 27, 18, MLV_COLOR_DARKGREEN );
-    //reine frelon (bleu fonce)
-    if(reine_frelon) MLV_draw_filled_rectangle( sizex+27, sizey, 27, 18, MLV_COLOR_DARKBLUE );
-    else MLV_draw_filled_rectangle( sizex+27, sizey, 27, 18, MLV_COLOR_DARKGREEN );
-    //ouvriere (jaune clair)
-    if(ouvriere) MLV_draw_filled_rectangle( sizex, sizey+18, 18, 18, MLV_COLOR_LIGHTYELLOW );
-    else MLV_draw_filled_rectangle( sizex, sizey+18, 18, 18, MLV_COLOR_DARKGREEN );
-    //Ruche/Nid (noir)
-    if(maison) MLV_draw_filled_rectangle( sizex+18, sizey+18, 18, 18, MLV_COLOR_BLACK );
-    else MLV_draw_filled_rectangle( sizex+18, sizey+18, 18, 18, MLV_COLOR_DARKGREEN );
-    //Frelon (bleu)
-    if(frelon) MLV_draw_filled_rectangle( sizex+36, sizey+18, 18, 18, MLV_COLOR_BLUE );
-    else MLV_draw_filled_rectangle( sizex+36, sizey+18, 18, 18, MLV_COLOR_DARKGREEN );
-    //Guerriere (orange)
-    if(guerriere) MLV_draw_filled_rectangle( sizex, sizey+36, 27, 18, MLV_COLOR_ORANGE );
-    else MLV_draw_filled_rectangle( sizex, sizey+36, 27, 18, MLV_COLOR_DARKGREEN );
-    //Escadron (rouge)
-    if(escadron) MLV_draw_filled_rectangle( sizex+27, sizey+36, 27, 18, MLV_COLOR_RED );
-    else MLV_draw_filled_rectangle( sizex+27, sizey+36, 27, 18, MLV_COLOR_DARKGREEN );
-}
-
-void grille(int lig, int col,Grille *jeu){
-    int reine_abeille=0;
-    int reine_frelon=0;
-    int ouvriere=0;
-    int maison=0;
-    int frelon=0;
-    int guerriere=0;
-    int escadron=0;
-    for(int i=600;i<lig;i+=54){
-        for(int j=20;j<col;j+=54){
-            reine_abeille=reine_frelon=ouvriere=maison=frelon=guerriere=escadron=0;
-            //parcourt la case du plateau en question et cherche le type de ses 
-            //occupants ou le camp de ses colonies puis incremente les variables en consequences
-            for(;jeu->plateau[(i-600)%54][(j-20)%54].occupant->type!=NULL;jeu->plateau[(i-600)%54][(j-20)%54].occupant->vsuiv){ //Trés bizarre
-                switch(jeu->plateau[(i-600)%54][(j-20)%54].occupant->type){
-                    case REINE:
-                        if(jeu->plateau[(i-600)%54][(j-20)%54].occupant->camp==ABEILLE) reine_abeille=1;
-                        else reine_frelon=1;
-                        break;
-                    case OUVRIERE:
-                        ouvriere=1;
-                        break;
-                    case FRELON:
-                        frelon=1;
-                        break;
-                    case GUERRIERE:
-                        guerriere=1;
-                        break;
-                    case ESCADRON:
-                        escadron=1;
-                        break;
-                    }
-            for(;jeu->plateau[(i-600)%54][(j-20)%54].colonie->type==NULL;jeu->plateau[(i-600)%54][(j-20)%54].colonie->vsuiv){
-                switch(jeu->plateau[(i-600)%54][(j-20)%54].colonie->camp){
-                    case FRELONCAMP:
-                        maison=1;
-                        break;
-                    case ABEILLE:
-                        maison=1;
-                        break;
-                    }
-                }
-            affiche_case(i,j,reine_abeille,reine_frelon,ouvriere,maison,frelon,guerriere,escadron);
-        }}}
-    MLV_update_window();
-    }
-
-void menu(char* pos, char* action){
-    //affichage des coordonnées de l'unite en cours (250,225)
-    MLV_draw_adapted_text_box(140,140,"Coordonnées de l'unite en cours:",10,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    //case pour faire une action (250,350)
-    MLV_draw_adapted_text_box(150,275,"Faire une action" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    // deplacer (250,475)
-    MLV_draw_adapted_text_box(150,400,"Se Deplacer" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    //skip (250,600)
-    MLV_draw_adapted_text_box(150,525,"Passer le tour" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    // action en cours (250,725)
-    MLV_draw_adapted_text_box(150,650,"Détruire une unité" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    // Détruire une unité (250,850)
-    MLV_draw_adapted_text_box(140,890,"Action en cours:" , 10,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    MLV_draw_text(390,150,pos,MLV_COLOR_RED);// x à revoir en fonction de l'emplacement du texte
-    MLV_draw_text(280,900,action,MLV_COLOR_RED); // x à revoir en fonction de l'emplacement du texte
-    MLV_update_window();
-    }
-
-void partie(char* tour, char* clan){
-    //affichage des coordonnées de l'unite en cours (250,225)
-    MLV_draw_adapted_text_box(1510,140,"Nombre de tour:",10,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    //case pour faire une action (250,350)
-    MLV_draw_adapted_text_box(1520,275,"Sauvegarder la Partie" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    // deplacer (250,475)
-    MLV_draw_adapted_text_box(1520,400,"Charger la sauvegarde" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    //skip (250,600)
-    MLV_draw_adapted_text_box(1520,525,"Quitter la partie" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    // action en cours (250,725)
-    MLV_draw_adapted_text_box(1520,650,"Fin du tour" , 50,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    // Détruire une unité (250,850)
-    MLV_draw_adapted_text_box(1510,890,"Clan du joueur en cours:" , 10,MLV_COLOR_YELLOW,MLV_COLOR_YELLOW,MLV_COLOR_BLACK,MLV_TEXT_CENTER);
-    MLV_draw_text(1650,150,tour,MLV_COLOR_RED);// x à revoir en fonction de l'emplacement du texte
-    MLV_draw_text(1700,900,clan,MLV_COLOR_RED); // x à revoir en fonction de l'emplacement du texte
-    MLV_update_window();
-    }
-
-void charger_partie(Grille *jeu, char* save,char joueur_actuelle) {
+void charger_partie(Grille *jeu, char* save,char* joueur_actuelle) {
     FILE *fichier;
-    fichier = fopen("sauvegarde_partie.txt", "r"); 
-    char ligne[20] = "";
+    fichier = fopen(save, "r"); 
+    char  camp , type , production;
+    int posx ,posy,toursrestant;
+    Unite *tmp,*c,*tmp2;
     if (fichier == NULL) {
         printf("Aucune sauvegarde trouvée.\nNous commencont une nouvelle partie.\n");
     } else {    
-        //fscanf(fichier, "%d %d", &partie.niveau, &partie.score);
-        fgets(ligne, sizeof(ligne), fichier);
-        scanf(fichier, "%c %d %d\n", joueur_actuelle, jeu->ressourcesAbeille, jeu->ressourcesFrelon);
-        while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
-        printf("%s", ligne); // Affiche chaque ligne lue depuis le fichier
-    }
+        fscanf(fichier, "%c %d %d", &(*joueur_actuelle), &jeu->ressourcesAbeille, &jeu->ressourcesFrelon);
+        while (fscanf(fichier, " %c %c %d %d %c %d", &camp,&type,&posx,&posy,&production,&toursrestant) >= 5) {
+          if(camp == ABEILLE){
+            if(type == RUCHE){
+              tmp = creer_abeille(type,posx,posy,' ',toursrestant);
+              ajoute_colonie(jeu,tmp,posx,posy);
+              }
+            else{
+              c = creer_abeille(type,posx,posy,' ',toursrestant);
+              ajoute_unite(&tmp,c);
+              ajoute_occupant(&jeu->plateau[posx][posy].occupant,c);
+            }
+          } 
+          else{
+            if(type == NID){
+              tmp = creer_frelon(type,posx,posy,' ',toursrestant);
+              if(jeu->frelon == NULL) jeu->abeille = tmp;
+              ajoute_colonie(jeu,tmp,posx,posy);
+            }
+            else{
+              c = creer_frelon(type,posx,posy,' ',toursrestant);
+              ajoute_unite(&tmp,c);
+              ajoute_occupant(&jeu->plateau[posx][posy].occupant,c);
+            }
+          }
+        }
 
         fclose(fichier); 
     }
@@ -1526,35 +1430,36 @@ void sauvegarder_partie(Grille *jeu,char joueur_actuelle, char* save) {
     FILE *fichier;
     Unite* tmp,*tmp2;
     fichier = fopen(save,"w");
-
     if (fichier == NULL) {
-        printf("Erreur lors de l'ouverture du fichier de sauvegarde.\n");
+        printf("Erreur lors de l'ouverture du fichier %s de sauvegarde.\nCette partie a été annulée et pas sauvegarder\n",save);
     }
     else {
-        if(joueur_actuelle == ABEILLE){
-          fprintf(fichier, "%c %d %d\n", joueur_actuelle, jeu->ressourcesAbeille, jeu->ressourcesFrelon);
+      if(joueur_actuelle == ABEILLE){
+        fprintf(fichier, "%c %d %d\n", joueur_actuelle, jeu->ressourcesAbeille, jeu->ressourcesFrelon);
+      }
+      else fprintf(fichier, "%c %d %d\n", joueur_actuelle, jeu->ressourcesFrelon, jeu->ressourcesAbeille);
+      tmp = jeu->frelon;
+      while(tmp != NULL){
+        tmp2 = tmp;
+        while(tmp2 !=NULL){
+          fprintf(fichier, "%c %c %d %d %c %d\n", tmp2->camp,tmp2->type,tmp2->posx,tmp2->posy,tmp2->production,tmp2->toursrestant);
+          tmp2 = tmp2->usuiv;
         }
-        else fprintf(fichier, "%c %d %d\n", joueur_actuelle, jeu->ressourcesFrelon, jeu->ressourcesAbeille);
-        tmp = jeu->frelon;
-        while(tmp != NULL){
-          tmp2 = tmp;
-          while(tmp2 !=NULL){
-            fprintf(fichier, "%c %c %d %d %c %d\n", tmp2->camp,tmp2->type,tmp2->posx,tmp2->posy,tmp2->production,tmp2->toursrestant);
-            tmp2 = tmp2->usuiv;
+        tmp = tmp->colsuiv;
+      }
+      tmp = jeu->abeille;
+      while(tmp != NULL){
+        tmp2 = tmp;
+        while(tmp2 !=NULL){
+          fprintf(fichier, "%c %c %d %d %c %d\n", tmp2->camp,tmp2->type,tmp2->posx,tmp2->posy,tmp2->production,tmp2->toursrestant);
+          tmp2 = tmp2->usuiv;
           }
           tmp = tmp->colsuiv;
-        }
-        tmp = jeu->abeille;
-        while(tmp != NULL){
-          tmp2 = tmp;
-          while(tmp2 !=NULL){
-            fprintf(fichier, "%c %c %d %d %c %d\n", tmp2->camp,tmp2->type,tmp2->posx,tmp2->posy,tmp2->production,tmp2->toursrestant);
-            tmp2 = tmp2->usuiv;
-            }
-            tmp = tmp->colsuiv;
-        }
+      }
+      fclose(fichier); 
+      printf("Fichier bien enregistrer.\n");
     }
-    fclose(fichier); 
+
 }
 
 int main(){
@@ -1562,26 +1467,51 @@ int main(){
   
   Grille jeu;
   Point P;
-  int res_combat = 0;
-  Unite * frelon,*abeille,*col_abeille,*col_frelon;
+  int sauvegarde = 0;
+  int res_combat = 0 , sauve2 = 1;
   Unite *tmp,*tmp2;
   jeu.abeille = NULL;
   jeu.frelon = NULL;
+  
+  char nom_save[20];
+  char beginner, save,sauve,charge;
   init_tab(jeu.plateau);
-  initialisation_jeu(&jeu);
-  char beginner, save;
-  if(rand()%2 == 0)beginner = ABEILLE;
-  else beginner = FRELONCAMP;
-  printf("C'est le joueur %c qui commence.\n",beginner);
-  do{
-    printf("Voulez vous sauvegardez ? (o où n)");
-    scanf("%c",save);
-  }while(save = 'o' || save == 'n');
 
-/*
-  while(jeu.abeille != NULL && jeu.frelon != NULL){
+
+  do{
+  printf("Voulez vous chargez une partie existante?(o or n)\n");
+  scanf(" %c",&charge);
+  }while(charge != 'o' && charge != 'n');
+
+  if( charge == 'o'){
+    printf("Mettez le nom de la partie\n");
+    scanf(" %s",nom_save);
+    charger_partie(&jeu,nom_save,&beginner);
+  }
+  else{
+    if(rand()%2 == 0)
+      beginner = ABEILLE;
+    else beginner = FRELONCAMP;
+      printf("C'est le joueur %c qui commence.\n",beginner);
+  }
+
+
+  if(jeu.abeille == NULL && jeu.frelon == NULL){
+    do{
+      printf("Voulez vous sauvegardez ? (o où n)\n");
+      scanf(" %c",&save);
+    }while(save != 'o' && save != 'n');
+    if(save == 'o'){
+      printf("Choisissez un nom de sauvegarde. \n");
+      scanf(" %s",nom_save);
+      sauvegarde = 1;
+    }
+    initialisation_jeu(&jeu);
+  }
+
+  while(jeu.abeille != NULL && jeu.frelon != NULL && sauve2 != 0){
     tour(&jeu,beginner);
-    combat_final(jeu);
+    combat_final(&jeu);
     tmp = jeu.abeille;
     while(tmp != NULL){
       tmp2 = tmp;
@@ -1600,14 +1530,31 @@ int main(){
       }
       tmp = tmp->colsuiv;
     }
+    jeu.tour++;
     if(jeu.abeille == NULL)
       printf("Les Frelons ont gagnés.\n");
-    if(jeu.frelon == NULL)
+    else if(jeu.frelon == NULL)
       printf("Les Abeilles ont gagnées.\n");
-    jeu.tour++;
-  }*/
+    else {
+      if(sauvegarde  == 1){
+        do{
+          printf("Voulez vous sauvegardez ?('o' ou 'n')\n");
+          scanf(" %c",&sauve);
+          if(sauve = 'o' ){
+            sauvegarder_partie(&jeu,beginner,nom_save);
+            sauve2 = 0;
+          }
+          else if(sauve = 'n'){
+            sauve2 = 1;
+          }
+          else sauve2 = -1;
+        }while(sauve2 < 0);
+      }
+    }
+  }
 
   //test pour l'affichage graphique
+  /*
   MLV_create_full_screen_window("Kingdom","Kingdom",1920,1080);
   grille(1272,972,&jeu);
   MLV_wait_seconds(1);
@@ -1615,6 +1562,6 @@ int main(){
   partie("shin","kyoukai");
   MLV_wait_seconds(30);
   MLV_update_window();
-  
+  */
   return 0;
 }
